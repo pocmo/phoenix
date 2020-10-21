@@ -25,7 +25,6 @@ import android.content.res.TypedArray
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
@@ -34,12 +33,14 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.RangeInfoCompat.RANGE_TYPE_PERCENT
+import androidx.core.view.isVisible
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import org.mozilla.fenix.R
 
 import java.text.NumberFormat
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -58,72 +59,95 @@ import kotlin.math.roundToInt
  * Other [SeekBar] specific attributes (e.g. `title, summary, defaultValue, min, max`)
  * can be set directly on the preference widget layout.
  */
-@SuppressWarnings("LargeClass")
 class TextPercentageSeekBarPreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = R.attr.seekBarPreferenceStyle,
     defStyleRes: Int = 0
 ) : Preference(context, attrs, defStyleAttr, defStyleRes) {
-    /* synthetic access */
-    internal var mSeekBarValue: Int = 0
-    /* synthetic access */
-    internal var mMin: Int = 0
-    private var mMax: Int = 0
-    private var mSeekBarIncrement: Int = 0
-    /* synthetic access */
-    internal var mTrackingTouch: Boolean = false
-    /* synthetic access */
-    internal var mSeekBar: SeekBar? = null
-    private var mSeekBarValueTextView: TextView? = null
-    private var mExampleTextTextView: TextView? = null
+    internal var trackingTouch: Boolean = false
+    private var seekBar: SeekBar? = null
+    private var seekBarValueTextView: TextView? = null
+    private var exampleTextTextView: TextView? = null
+
     /**
      * Whether the SeekBar should respond to the left/right keys
      */
-    /* synthetic access */
-    var isAdjustable: Boolean = false
+    private val isAdjustable: Boolean
+
     /**
-     * Whether to show the SeekBar value TextView next to the bar
+     * Whether the SeekBarPreference should continuously save the SeekBar value while it is being dragged.
      */
-    private var mShowSeekBarValue: Boolean = false
+    private val updatesContinuously: Boolean
+
     /**
-     * Whether the SeekBarPreference should continuously save the Seekbar value while it is being dragged.
+     * The lower bound set on the [SeekBar].
      */
-    /* synthetic access */
-    var updatesContinuously: Boolean = false
+    private var min: Int
+
     /**
-     * Listener reacting to the [SeekBar] changing value by the user
+     * The upper bound set on the [SeekBar].
      */
-    private val mSeekBarChangeListener = object : OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-            if (fromUser && (updatesContinuously || !mTrackingTouch)) {
-                syncValueInternal(seekBar)
-            } else {
-                // We always want to update the text while the seekbar is being dragged
-                updateLabelValue(progress + mMin)
-                updateExampleTextValue(progress + mMin)
+    private var max: Int
+
+    /**
+     * The amount of increment change via each arrow key click. This value is derived from
+     * user's specified increment value if it's not zero. Otherwise, the default value is picked
+     * from the default mKeyProgressIncrement value in [android.widget.AbsSeekBar].
+     * @return The amount of increment on the [SeekBar] performed after each user's arrow
+     * key press
+     */
+    private var seekBarIncrement: Int = 0
+        set(seekBarIncrement) {
+            if (seekBarIncrement != field) {
+                field = abs(seekBarIncrement).coerceAtMost(max - min)
+                notifyChanged()
             }
         }
 
-        override fun onStartTrackingTouch(seekBar: SeekBar) {
-            mTrackingTouch = true
-        }
+    /**
+     * The current value of the [SeekBar] in [min]..[max]
+     */
+    internal var seekBarValue: Int = 0
+        set(value) {
+            val coercedValue = value.coerceIn(min..max)
 
-        override fun onStopTrackingTouch(seekBar: SeekBar) {
-            mTrackingTouch = false
-            if (seekBar.progress + mMin != mSeekBarValue) {
-                syncValueInternal(seekBar)
+            if (coercedValue != field) {
+                field = coercedValue
+                updateLabelValue(field)
+                updateExampleTextValue(field)
+                persistInt(field)
             }
         }
+
+    /**
+     * Whether the current [SeekBar] value is displayed to the user.
+     */
+    private val showSeekBarValue: Boolean
+
+    init {
+        val a = context.obtainStyledAttributes(
+            attrs, R.styleable.SeekBarPreference, defStyleAttr, defStyleRes
+        )
+
+        min = a.getInt(R.styleable.SeekBarPreference_min, 0)
+        max = a.getInt(R.styleable.SeekBarPreference_android_max, SEEK_BAR_MAX)
+        seekBarIncrement = a.getInt(R.styleable.SeekBarPreference_seekBarIncrement, 0)
+        isAdjustable = a.getBoolean(R.styleable.SeekBarPreference_adjustable, true)
+        showSeekBarValue = a.getBoolean(R.styleable.SeekBarPreference_showSeekBarValue, false)
+        updatesContinuously = a.getBoolean(
+            R.styleable.SeekBarPreference_updatesContinuously,
+            false
+        )
+        a.recycle()
     }
 
     /**
      * Listener reacting to the user pressing DPAD left/right keys if `adjustable` attribute is
-     * set to true; it transfers the key presses to the [SeekBar]
-     * to be handled accordingly.
+     * set to true; it transfers the key presses to the [SeekBar] to be handled accordingly.
      */
-    private val mSeekBarKeyListener = View.OnKeyListener { _, keyCode, event ->
-        return@OnKeyListener if (event.action != KeyEvent.ACTION_DOWN) {
+    private val seekBarKeyListener = View.OnKeyListener { _, keyCode, event ->
+        if (event.action != KeyEvent.ACTION_DOWN) {
             false
         } else if (!isAdjustable && (keyCode == KeyEvent.KEYCODE_DPAD_LEFT || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
             // Right or left keys are pressed when in non-adjustable mode; Skip the keys.
@@ -132,198 +156,92 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
             // We don't want to propagate the click keys down to the SeekBar view since it will
             // create the ripple effect for the thumb.
             false
-        } else if (mSeekBar == null) {
-            Log.e(TAG, "SeekBar view is null and hence cannot be adjusted.")
-            false
         } else {
-            mSeekBar!!.onKeyDown(keyCode, event)
+            seekBar!!.onKeyDown(keyCode, event)
         }
     }
 
     /**
-     * Gets the lower bound set on the [SeekBar].
-     * @return The lower bound set
-     * Sets the lower bound on the [SeekBar].
-     * @param min The lower bound to set
+     * Listener reacting to the [SeekBar] changing value by the user
      */
-    var min: Int
-        get() = mMin
-        set(min) {
-            var minimum = min
-            if (minimum > mMax) {
-                minimum = mMax
-            }
-            if (minimum != mMin) {
-                mMin = minimum
-                notifyChanged()
+    private val mSeekBarChangeListener = object : OnSeekBarChangeListener {
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+            if (fromUser && (updatesContinuously || !trackingTouch)) {
+                syncValue(seekBar)
+            } else {
+                // We always want to update the text while the seekbar is being dragged
+                updateLabelValue(progress + min)
+                updateExampleTextValue(progress + min)
             }
         }
 
-    /**
-     * Returns the amount of increment change via each arrow key click. This value is derived from
-     * user's specified increment value if it's not zero. Otherwise, the default value is picked
-     * from the default mKeyProgressIncrement value in [android.widget.AbsSeekBar].
-     * @return The amount of increment on the [SeekBar] performed after each user's arrow
-     * key press
-     */
-    var seekBarIncrement: Int
-        get() = mSeekBarIncrement
-        /**
-         * Sets the increment amount on the [SeekBar] for each arrow key press.
-         * @param seekBarIncrement The amount to increment or decrement when the user presses an
-         * arrow key.
-         */
-        set(seekBarIncrement) {
-            if (seekBarIncrement != mSeekBarIncrement) {
-                mSeekBarIncrement = Math.min(mMax - mMin, Math.abs(seekBarIncrement))
-                notifyChanged()
-            }
+        override fun onStartTrackingTouch(seekBar: SeekBar) {
+            trackingTouch = true
         }
 
-    /**
-     * Gets/Sets the upper bound set on the [SeekBar].
-     */
-    var max: Int
-        get() = mMax
-        set(max) {
-            var maximum = max
-            if (maximum < mMin) {
-                maximum = mMin
-            }
-            if (maximum != mMax) {
-                mMax = maximum
-                notifyChanged()
+        override fun onStopTrackingTouch(seekBar: SeekBar) {
+            trackingTouch = false
+            if (seekBar.progress + min != seekBarValue) {
+                syncValue(seekBar)
             }
         }
-
-    /**
-     * Gets whether the current [SeekBar] value is displayed to the user.
-     * @return Whether the current [SeekBar] value is displayed to the user
-     * @see .setShowSeekBarValue
-     */
-    var showSeekBarValue: Boolean
-        get() = mShowSeekBarValue
-        /**
-         * Sets whether the current [SeekBar] value is displayed to the user.
-         * @param showSeekBarValue Whether the current [SeekBar] value is displayed to the user
-         * @see .getShowSeekBarValue
-         */
-        set(showSeekBarValue) {
-            mShowSeekBarValue = showSeekBarValue
-            notifyChanged()
-        }
-
-    /**
-     * Gets/Sets the current progress of the [SeekBar].
-     */
-    var value: Int
-        get() = mSeekBarValue
-        set(seekBarValue) = setValueInternal(seekBarValue, true)
-
-    init {
-        val a = context.obtainStyledAttributes(
-            attrs, R.styleable.SeekBarPreference, defStyleAttr, defStyleRes
-        )
-
-        // The ordering of these two statements are important. If we want to set max first, we need
-        // to perform the same steps by changing min/max to max/min as following:
-        // mMax = a.getInt(...) and setMin(...).
-        mMin = a.getInt(R.styleable.SeekBarPreference_min, 0)
-        max = a.getInt(R.styleable.SeekBarPreference_android_max, SEEK_BAR_MAX)
-        seekBarIncrement = a.getInt(R.styleable.SeekBarPreference_seekBarIncrement, 0)
-        isAdjustable = a.getBoolean(R.styleable.SeekBarPreference_adjustable, true)
-        mShowSeekBarValue = a.getBoolean(R.styleable.SeekBarPreference_showSeekBarValue, false)
-        updatesContinuously = a.getBoolean(
-            R.styleable.SeekBarPreference_updatesContinuously,
-            false
-        )
-        a.recycle()
     }
 
     override fun onBindViewHolder(view: PreferenceViewHolder) {
         super.onBindViewHolder(view)
-        view.itemView.setOnKeyListener(mSeekBarKeyListener)
-        mSeekBar = view.findViewById(R.id.seekbar) as SeekBar
-        mExampleTextTextView = view.findViewById(R.id.sampleText) as TextView
-        mSeekBarValueTextView = view.findViewById(R.id.seekbar_value) as TextView
-        if (mShowSeekBarValue) {
-            mSeekBarValueTextView?.visibility = View.VISIBLE
+        seekBar = view.findViewById(R.id.seekbar) as SeekBar
+        view.itemView.setOnKeyListener(seekBarKeyListener)
+        val seekBar = seekBar!!
+        exampleTextTextView = view.findViewById(R.id.sampleText) as TextView
+        seekBarValueTextView = view.findViewById(R.id.seekbar_value) as TextView
+        if (showSeekBarValue) {
+            seekBarValueTextView!!.isVisible = true
         } else {
-            mSeekBarValueTextView?.visibility = View.GONE
-            mSeekBarValueTextView = null
+            seekBarValueTextView!!.isVisible = false
+            seekBarValueTextView = null
         }
 
-        if (mSeekBar == null) {
-            Log.e(TAG, "SeekBar view is null in onBindViewHolder.")
-            return
-        }
-        mSeekBar?.setOnSeekBarChangeListener(mSeekBarChangeListener)
-        mSeekBar?.max = mMax - mMin
-        // If the increment is not zero, use that. Otherwise, use the default mKeyProgressIncrement
-        // in AbsSeekBar when it's zero. This default increment value is set by AbsSeekBar
-        // after calling setMax. That's why it's important to call setKeyProgressIncrement after
-        // calling setMax() since setMax() can change the increment value.
-        if (mSeekBarIncrement != 0) {
-            mSeekBar?.keyProgressIncrement = mSeekBarIncrement
+        seekBar.setOnSeekBarChangeListener(mSeekBarChangeListener)
+        seekBar.max = max - min
+        // If the increment is not zero, use that. Otherwise, use the default keyProgressIncrement
+        // in SeekBar when it's zero. This default increment value is set by SeekBar
+        // after setting max. That's why it's important to set keyProgressIncrement after
+        // setting max since that can change the increment value.
+        if (seekBarIncrement != 0) {
+            seekBar.keyProgressIncrement = seekBarIncrement
         } else {
-            mSeekBarIncrement = mSeekBar!!.keyProgressIncrement
+            seekBarIncrement = seekBar.keyProgressIncrement
         }
 
-        mSeekBar?.progress = mSeekBarValue - mMin
-        updateExampleTextValue(mSeekBarValue)
-        updateLabelValue(mSeekBarValue)
-        mSeekBar?.isEnabled = isEnabled
-        mSeekBar?.let {
-            it.thumbOffset = it.thumb.intrinsicWidth.div(2 * PI).roundToInt()
-        }
+        seekBar.progress = seekBarValue - min
+        updateExampleTextValue(seekBarValue)
+        updateLabelValue(seekBarValue)
+        seekBar.isEnabled = isEnabled
+        seekBar.thumbOffset = seekBar.thumb.intrinsicWidth.div(2 * PI).roundToInt()
     }
 
     override fun onSetInitialValue(initialValue: Any?) {
-        var defaultValue = initialValue
-        if (defaultValue == null) {
-            defaultValue = 0
-        }
-        value = getPersistedInt((defaultValue as Int?)!!)
+        this.seekBarValue = getPersistedInt((initialValue as Int?) ?: 0)
+        notifyChanged()
     }
 
-    override fun onGetDefaultValue(a: TypedArray?, index: Int): Any {
-        return a!!.getInt(index, 0)
-    }
-
-    private fun setValueInternal(value: Int, notifyChanged: Boolean) {
-        var seekBarValue = value
-        if (seekBarValue < mMin) {
-            seekBarValue = mMin
-        }
-        if (seekBarValue > mMax) {
-            seekBarValue = mMax
-        }
-
-        if (seekBarValue != mSeekBarValue) {
-            mSeekBarValue = seekBarValue
-            updateLabelValue(mSeekBarValue)
-            updateExampleTextValue(mSeekBarValue)
-            persistInt(seekBarValue)
-            if (notifyChanged) {
-                notifyChanged()
-            }
-        }
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any {
+        return a.getInt(index, 0)
     }
 
     /**
      * Persist the [SeekBar]'s SeekBar value if callChangeListener returns true, otherwise
      * set the [SeekBar]'s value to the stored value.
      */
-    /* synthetic access */
-    internal fun syncValueInternal(seekBar: SeekBar) {
-        val seekBarValue = mMin + seekBar.progress
-        if (seekBarValue != mSeekBarValue) {
+    internal fun syncValue(seekBar: SeekBar) {
+        val seekBarValue = min + seekBar.progress
+        if (seekBarValue != this.seekBarValue) {
             if (callChangeListener(seekBarValue)) {
-                setValueInternal(seekBarValue, false)
+                this.seekBarValue = seekBarValue
             } else {
-                seekBar.progress = mSeekBarValue - mMin
-                updateLabelValue(mSeekBarValue)
-                updateExampleTextValue(mSeekBarValue)
+                seekBar.progress = this.seekBarValue - min
+                updateLabelValue(this.seekBarValue)
+                updateExampleTextValue(this.seekBarValue)
             }
         }
     }
@@ -333,34 +251,29 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
      *
      * @param labelValue the value to display next to the [SeekBar]
      */
-    /* synthetic access */
     internal fun updateLabelValue(labelValue: Int) {
-        var value = labelValue
-        if (mSeekBarValueTextView != null) {
-            value = value * STEP_SIZE + MIN_VALUE
+        seekBarValueTextView?.let {
+            val value = labelValue * STEP_SIZE + MIN_VALUE
             val decimalValue = (value / DECIMAL_CONVERSION).toDouble()
             val percentage = NumberFormat.getPercentInstance().format(decimalValue)
-            mSeekBarValueTextView?.text = percentage
+            it.text = percentage
         }
-
-        mSeekBar?.setAccessibilityDelegate(object :
+        seekBar?.accessibilityDelegate = object :
             View.AccessibilityDelegate() {
             override fun onInitializeAccessibilityNodeInfo(
-                host: View?,
-                info: AccessibilityNodeInfo?
+                host: View,
+                info: AccessibilityNodeInfo
             ) {
                 super.onInitializeAccessibilityNodeInfo(host, info)
-                val initialInfo = info?.rangeInfo
-                info?.rangeInfo = initialInfo?.let {
+                info.rangeInfo =
                     AccessibilityNodeInfo.RangeInfo.obtain(
                         RANGE_TYPE_PERCENT,
                         MIN_VALUE.toFloat(),
                         SEEK_BAR_MAX.toFloat(),
-                        convertCurrentValue(it.current)
+                        convertCurrentValue(info.rangeInfo.current)
                     )
-                }
             }
-        })
+        }
     }
 
     /**
@@ -369,13 +282,10 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
      * @param textValue the value of text size
      */
     internal fun updateExampleTextValue(textValue: Int) {
-        var value = textValue
-        if (mExampleTextTextView != null) {
-            value = value * STEP_SIZE + MIN_VALUE
-            val decimal = value / DECIMAL_CONVERSION
-            val textSize = TEXT_SIZE * decimal
-            mExampleTextTextView?.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
-        }
+        val value = textValue * STEP_SIZE + MIN_VALUE
+        val decimal = value / DECIMAL_CONVERSION
+        val textSize = TEXT_SIZE * decimal
+        exampleTextTextView?.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize)
     }
 
     override fun onSaveInstanceState(): Parcelable {
@@ -387,9 +297,9 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
 
         // Save the instance state
         val myState = SavedState(superState)
-        myState.mSeekBarValue = mSeekBarValue
-        myState.mMin = mMin
-        myState.mMax = mMax
+        myState.mSeekBarValue = seekBarValue
+        myState.min = min
+        myState.max = max
         return myState
     }
 
@@ -400,17 +310,18 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
             return
         }
 
+        val savedState = state as SavedState
+
         // Restore the instance state
-        val myState = state as SavedState?
-        super.onRestoreInstanceState(myState!!.superState)
-        mSeekBarValue = myState.mSeekBarValue
-        mMin = myState.mMin
-        mMax = myState.mMax
+        super.onRestoreInstanceState(savedState.superState)
+        seekBarValue = savedState.mSeekBarValue
+        min = savedState.min
+        max = savedState.max
         notifyChanged()
     }
 
     /**
-     * SavedState, a subclass of [BaseSavedState], will store the state of this preference.
+     * SavedState, a subclass of [Preference.BaseSavedState], will store the state of this preference.
      *
      *
      * It is important to always call through to super methods.
@@ -418,15 +329,15 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
     private class SavedState : BaseSavedState {
 
         internal var mSeekBarValue: Int = 0
-        internal var mMin: Int = 0
-        internal var mMax: Int = 0
+        internal var min: Int = 0
+        internal var max: Int = 0
 
         internal constructor(source: Parcel) : super(source) {
 
             // Restore the click counter
             mSeekBarValue = source.readInt()
-            mMin = source.readInt()
-            mMax = source.readInt()
+            min = source.readInt()
+            max = source.readInt()
         }
 
         internal constructor(superState: Parcelable) : super(superState)
@@ -436,20 +347,17 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
 
             // Save the click counter
             dest.writeInt(mSeekBarValue)
-            dest.writeInt(mMin)
-            dest.writeInt(mMax)
+            dest.writeInt(min)
+            dest.writeInt(max)
         }
 
-        companion object {
-            @JvmField
-            val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-                override fun createFromParcel(`in`: Parcel): SavedState {
-                    return SavedState(`in`)
-                }
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(source: Parcel): SavedState {
+                return SavedState(source)
+            }
 
-                override fun newArray(size: Int): Array<SavedState?> {
-                    return arrayOfNulls(size)
-                }
+            override fun newArray(size: Int): Array<SavedState?> {
+                return arrayOfNulls(size)
             }
         }
     }
@@ -459,7 +367,6 @@ class TextPercentageSeekBarPreference @JvmOverloads constructor(
     }
 
     companion object {
-        private const val TAG = "SeekBarPreference"
         private const val STEP_SIZE = 5
         private const val MIN_VALUE = 50
         private const val DECIMAL_CONVERSION = 100f
