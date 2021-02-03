@@ -138,9 +138,43 @@ class TopSitesTest {
             verifyExistingTopSitesTabs(defaultWebPageTitle)
         }.openContextMenuOnTopSitesWithTitle(defaultWebPageTitle) {
             verifyTopSiteContextMenuItems()
+        }.clickEdit {
+            verifyEditTopSiteValues(defaultWebPageTitle, defaultWebPage.url.toString())
         }.renameTopSite(defaultWebPageTitleNew) {
             verifyExistingTopSitesList()
             verifyExistingTopSitesTabs(defaultWebPageTitleNew)
+        }
+    }
+
+    @Test
+    fun verifyEditTopSiteUrl() {
+        val defaultWebPage = TestAssetHelper.getGenericAsset(mockWebServer, 1)
+        val defaultWebPageTitle = "Test_Page_1"
+
+        navigationToolbar {
+        }.enterURLAndEnterToBrowser(defaultWebPage.url) {
+        }.openThreeDotMenu {
+            verifyAddFirefoxHome()
+        }.addToFirefoxHome {
+            verifySnackBarText("Added to top sites!")
+        }.openTabDrawer {
+        }.openNewTab {
+        }.dismissSearchBar {
+            verifyExistingTopSitesList()
+            verifyExistingTopSitesTabs(defaultWebPageTitle)
+        }.openContextMenuOnTopSitesWithTitle(defaultWebPageTitle) {
+            verifyTopSiteContextMenuItems()
+        }.clickEdit {
+            verifyEditTopSiteValues(defaultWebPageTitle, defaultWebPage.url.toString())
+        }.editTopSiteUrl("") {
+            verifyEditTopSiteUrlInvalid()
+        }.editTopSiteUrl("not-a-url") {
+            verifyEditTopSiteUrlInvalid()
+        }.editTopSiteUrl(" barely-valid:url ") {
+            verifyExistingTopSitesList()
+            verifyExistingTopSitesTabs(defaultWebPageTitle)
+        }.openTopSiteTabWithTitle(title = defaultWebPageTitle) {
+            verifyUrl("barely-valid:url")
         }
     }
 

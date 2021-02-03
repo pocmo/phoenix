@@ -8,7 +8,10 @@ import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.addTextChangedListener
 import androidx.navigation.NavController
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +28,7 @@ import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.feature.top.sites.TopSite
 import mozilla.components.support.ktx.android.view.showKeyboard
 import mozilla.components.support.ktx.kotlin.isUrl
+import mozilla.components.support.ktx.kotlin.toNormalizedUrl
 import org.mozilla.fenix.BrowserDirection
 import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.R
@@ -93,9 +97,9 @@ interface SessionControlController {
     fun handlePrivateBrowsingLearnMoreClicked()
 
     /**
-     * @see [TopSiteInteractor.onRenameTopSiteClicked]
+     * @see [TopSiteInteractor.onEditTopSiteClicked]
      */
-    fun handleRenameTopSiteClicked(topSite: TopSite)
+    fun handleEditTopSiteClicked(topSite: TopSite)
 
     /**
      * @see [TopSiteInteractor.onRemoveTopSiteClicked]
@@ -311,35 +315,46 @@ class DefaultSessionControlController(
         )
     }
 
-    override fun handleRenameTopSiteClicked(topSite: TopSite) {
+    override fun handleEditTopSiteClicked(topSite: TopSite) {
         activity.let {
             val customLayout =
-                LayoutInflater.from(it).inflate(R.layout.top_sites_rename_dialog, null)
-            val topSiteLabelEditText: EditText =
-                customLayout.findViewById(R.id.top_site_title)
-            topSiteLabelEditText.setText(topSite.title)
+                LayoutInflater.from(it).inflate(R.layout.top_sites_edit_dialog, null)
+            val topSiteTitle: EditText = customLayout.findViewById(R.id.top_site_title)
+            val topSiteUrl: TextInputEditText = customLayout.findViewById(R.id.top_site_url)
+            val topSiteUrlLayout: TextInputLayout = customLayout.findViewById(R.id.top_site_url_layout)
+            topSiteTitle.setText(topSite.title)
+            topSiteUrl.setText(topSite.url)
 
             AlertDialog.Builder(it).apply {
-                setTitle(R.string.rename_top_site)
+                setTitle(R.string.edit_top_site)
                 setView(customLayout)
-                setPositiveButton(R.string.top_sites_rename_dialog_ok) { dialog, _ ->
-                    viewLifecycleScope.launch(Dispatchers.IO) {
-                        with(activity.components.useCases.topSitesUseCase) {
-                            updateTopSites(
-                                topSite,
-                                topSiteLabelEditText.text.toString(),
-                                topSite.url
-                            )
-                        }
-                    }
-                    dialog.dismiss()
-                }
+                setPositiveButton(R.string.top_sites_rename_dialog_ok) { _, _ -> }
                 setNegativeButton(R.string.top_sites_rename_dialog_cancel) { dialog, _ ->
                     dialog.cancel()
                 }
-            }.show().also {
-                topSiteLabelEditText.setSelection(0, topSiteLabelEditText.text.length)
-                topSiteLabelEditText.showKeyboard()
+            }.show().also { dialog ->
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    val newUrl = topSiteUrl.text.toString()
+                    if (newUrl.isUrl()) {
+                        viewLifecycleScope.launch(Dispatchers.IO) {
+                            with(activity.components.useCases.topSitesUseCase) {
+                                updateTopSites(
+                                        topSite,
+                                        topSiteTitle.text.toString(),
+                                        newUrl.toNormalizedUrl()
+                                )
+                            }
+                        }
+                        dialog.dismiss()
+                    } else {
+                        topSiteUrlLayout.error = activity.resources.getString(R.string.top_site_url_invalid)
+                    }
+                }
+                topSiteUrl.addTextChangedListener {
+                    topSiteUrlLayout.error = null
+                }
+                topSiteTitle.setSelection(0, topSiteTitle.text.length)
+                topSiteTitle.showKeyboard()
             }
         }
     }
