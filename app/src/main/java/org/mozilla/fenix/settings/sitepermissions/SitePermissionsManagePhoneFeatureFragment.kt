@@ -5,7 +5,6 @@
 package org.mozilla.fenix.settings.sitepermissions
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -19,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_manage_site_permissions_feature_phone.view.*
@@ -241,9 +241,11 @@ class SitePermissionsManagePhoneFeatureFragment : Fragment() {
         val subTextSize =
             resources.getDimensionPixelSize(R.dimen.phone_feature_label_recommended_text_size)
         val recommendedSpannable = SpannableString(subText)
+        val context = requireContext()
+        val subTextColor = ContextCompat.getColor(context, R.color.site_permissions_caption_color_normal_theme);
 
         recommendedSpannable.setSpan(
-            ForegroundColorSpan(Color.GRAY),
+            ForegroundColorSpan(subTextColor),
             0,
             recommendedSpannable.length,
             SPAN_EXCLUSIVE_INCLUSIVE
