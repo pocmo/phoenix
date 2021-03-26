@@ -18,6 +18,7 @@ import mozilla.components.browser.session.Session
 import mozilla.components.browser.session.SessionManager
 import mozilla.components.browser.session.engine.EngineMiddleware
 import mozilla.components.browser.session.storage.SessionStorage
+import mozilla.components.browser.state.search.RegionState
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.browser.storage.sync.PlacesBookmarksStorage
@@ -58,7 +59,6 @@ import mozilla.components.service.location.LocationService
 import mozilla.components.service.location.MozillaLocationService
 import mozilla.components.service.sync.autofill.AutofillCreditCardsAddressesStorage
 import mozilla.components.service.sync.logins.SyncableLoginsStorage
-import mozilla.components.support.locale.LocaleManager
 import org.mozilla.fenix.AppRequestInterceptor
 import org.mozilla.fenix.BuildConfig
 import org.mozilla.fenix.Config
@@ -74,8 +74,6 @@ import org.mozilla.fenix.perf.StrictModeManager
 import org.mozilla.fenix.perf.lazyMonitored
 import org.mozilla.fenix.search.telemetry.ads.AdsTelemetry
 import org.mozilla.fenix.search.telemetry.incontent.InContentTelemetry
-import org.mozilla.fenix.settings.SupportUtils
-import org.mozilla.fenix.settings.advanced.getSelectedLocale
 import org.mozilla.fenix.utils.Mockable
 import org.mozilla.fenix.utils.getUndoDelay
 
@@ -317,58 +315,26 @@ class Core(
     val pinnedSiteStorage by lazyMonitored { PinnedSiteStorage(context) }
 
     val topSitesStorage by lazyMonitored {
-        val defaultTopSites = mutableListOf<Pair<String, String>>()
+        val defaultTopSitesAdded = context.settings().defaultTopSitesAdded
 
-        strictMode.resetAfter(StrictMode.allowThreadDiskReads()) {
-            if (!context.settings().defaultTopSitesAdded) {
-                if (Config.channel.isMozillaOnline) {
-                    defaultTopSites.add(
-                        Pair(
-                            context.getString(R.string.default_top_site_baidu),
-                            SupportUtils.BAIDU_URL
-                        )
-                    )
-
-                    defaultTopSites.add(
-                        Pair(
-                            context.getString(R.string.default_top_site_jd),
-                            SupportUtils.JD_URL
-                        )
-                    )
-                } else {
-                    defaultTopSites.add(
-                        Pair(
-                            context.getString(R.string.default_top_site_google),
-                            SupportUtils.GOOGLE_URL
-                        )
-                    )
-
-                    if (LocaleManager.getSelectedLocale(context).language == "en") {
-                        defaultTopSites.add(
-                            Pair(
-                                context.getString(R.string.pocket_pinned_top_articles),
-                                SupportUtils.POCKET_TRENDING_URL
-                            )
-                        )
-                    }
-
-                    defaultTopSites.add(
-                        Pair(
-                            context.getString(R.string.default_top_site_wikipedia),
-                            SupportUtils.WIKIPEDIA_URL
-                        )
-                    )
-                }
-
-                context.settings().defaultTopSitesAdded = true
-            }
+        if (!defaultTopSitesAdded) {
+            context.settings().defaultTopSitesAdded = true
         }
 
-        DefaultTopSitesStorage(
-            pinnedSiteStorage,
-            historyStorage,
-            defaultTopSites
-        )
+        val region = if (Config.channel.isMozillaOnline) RegionState(
+            CN_REGION,
+            CN_REGION
+        ) else store.state.search.region
+
+        strictMode.resetAfter(StrictMode.allowThreadDiskReads()) {
+            DefaultTopSitesStorage(
+                context,
+                pinnedSiteStorage,
+                historyStorage,
+                region,
+                defaultTopSitesAdded
+            )
+        }
     }
 
     val permissionStorage by lazyMonitored { PermissionStorage(context) }
@@ -425,5 +391,6 @@ class Core(
         private const val KEY_STORAGE_NAME = "core_prefs"
         private const val PASSWORDS_KEY = "passwords"
         private const val RECENTLY_CLOSED_MAX = 10
+        private const val CN_REGION = "CN"
     }
 }
