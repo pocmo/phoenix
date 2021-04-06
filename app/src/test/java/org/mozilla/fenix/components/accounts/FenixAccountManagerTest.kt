@@ -5,6 +5,7 @@
 package org.mozilla.fenix.components.accounts
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import io.mockk.every
 import io.mockk.mockk
 import mozilla.components.concept.sync.OAuthAccount
@@ -27,12 +28,14 @@ class FenixAccountManagerTest {
     private lateinit var context: Context
     private lateinit var account: OAuthAccount
     private lateinit var profile: Profile
+    private lateinit var lifecycleOwner: LifecycleOwner
 
     @Before
     fun setUp() {
         context = mockk(relaxed = true)
         account = mockk(relaxed = true)
         profile = mockk(relaxed = true)
+        lifecycleOwner = mockk(relaxed = true)
         accountManagerComponent = mockk(relaxed = true)
     }
 
@@ -42,7 +45,7 @@ class FenixAccountManagerTest {
         every { accountManagerComponent.accountProfile() } returns profile
         every { context.components.backgroundServices.accountManager } returns accountManagerComponent
 
-        fenixFxaManager = FenixAccountManager(context)
+        fenixFxaManager = FenixAccountManager(context, lifecycleOwner)
 
         val emailAddress = "firefoxIsFun@test.com"
         every { accountManagerComponent.accountProfile()?.email } returns emailAddress
@@ -57,7 +60,7 @@ class FenixAccountManagerTest {
         every { accountManagerComponent.accountProfile() } returns null
         every { context.components.backgroundServices.accountManager } returns accountManagerComponent
 
-        fenixFxaManager = FenixAccountManager(context)
+        fenixFxaManager = FenixAccountManager(context, lifecycleOwner)
 
         val result = fenixFxaManager.accountProfileEmail
         assertEquals(null, result)
@@ -69,7 +72,7 @@ class FenixAccountManagerTest {
         every { accountManagerComponent.accountNeedsReauth() } returns false
         every { context.components.backgroundServices.accountManager } returns accountManagerComponent
 
-        fenixFxaManager = FenixAccountManager(context)
+        fenixFxaManager = FenixAccountManager(context, lifecycleOwner)
 
         val signedIn = fenixFxaManager.signedInToFxa()
         assertTrue(signedIn)
@@ -81,7 +84,7 @@ class FenixAccountManagerTest {
         every { accountManagerComponent.accountNeedsReauth() } returns true
         every { context.components.backgroundServices.accountManager } returns accountManagerComponent
 
-        fenixFxaManager = FenixAccountManager(context)
+        fenixFxaManager = FenixAccountManager(context, lifecycleOwner)
 
         val signedIn = fenixFxaManager.signedInToFxa()
         assertFalse(signedIn)
@@ -93,7 +96,7 @@ class FenixAccountManagerTest {
         every { accountManagerComponent.accountNeedsReauth() } returns true
         every { context.components.backgroundServices.accountManager } returns accountManagerComponent
 
-        fenixFxaManager = FenixAccountManager(context)
+        fenixFxaManager = FenixAccountManager(context, lifecycleOwner)
 
         val signedIn = fenixFxaManager.signedInToFxa()
         assertFalse(signedIn)

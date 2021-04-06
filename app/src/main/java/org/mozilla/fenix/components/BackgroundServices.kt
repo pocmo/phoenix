@@ -38,6 +38,7 @@ import mozilla.components.support.utils.RunWhenReadyQueue
 import org.mozilla.fenix.Config
 import org.mozilla.fenix.FeatureFlags
 import org.mozilla.fenix.R
+import org.mozilla.fenix.components.accounts.FxaServer
 import org.mozilla.fenix.perf.StrictModeManager
 import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.components.metrics.MetricController

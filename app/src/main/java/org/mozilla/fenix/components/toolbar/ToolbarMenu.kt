@@ -28,14 +28,14 @@ interface ToolbarMenu {
         object Quit : Item()
         object OpenInApp : Item()
         object SetDefaultBrowser : Item()
-        object Bookmark : Item()
+        object Bookmark : Item() // handles adding bookmark on tap
         object CustomizeReaderView : Item()
-        object Bookmarks : Item()
+        object Bookmarks : Item() // add/edit bookmark button label and navigation
         object History : Item()
         object Downloads : Item()
         object NewTab : Item()
     }
 
     val menuBuilder: BrowserMenuBuilder
-    val menuToolbar: BrowserMenuItemToolbar
+    val menuToolbarNavigation: BrowserMenuItemToolbar
 }
