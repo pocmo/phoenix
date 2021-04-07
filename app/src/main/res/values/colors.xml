@@ -82,7 +82,7 @@
     <color name="tab_history_item_selected_background_light_theme">@color/tab_tray_item_selected_background_light_theme</color>
 
     <!-- Dark theme color palette -->
-    <color name="primary_text_dark_theme">#FBFBFE</color>
+    <color name="primary_text_dark_theme">#FCFBFE</color>
     <color name="secondary_text_dark_theme">#A7A2B7</color>
     <color name="contrast_text_dark_theme">@color/primary_text_dark_theme</color>
     <color name="caption_text_dark_theme">@color/photonLightGrey70</color>
@@ -354,7 +354,7 @@
     <!-- Misc colors applied universally-->
     <color name="suggestion_highlight_color">#5C592ACB</color>
     <color name="private_browsing_button_accent_color">@color/foundation_private_theme</color>
-    <color name="white_color">#FBFBFE</color>
+    <color name="white_color">#FCFBFE</color>
     <color name="dark_grey_90">#15141A</color>
     <color name="neutral_text">@color/white_color</color>
     <color name="disabled_text">#cccccc</color>
