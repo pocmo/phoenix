@@ -71,6 +71,7 @@ open class DefaultToolbarMenu(
     private var isCurrentUrlBookmarked = false
     private var isBookmarkedJob: Job? = null
 
+    private val shouldDeleteDataOnQuit = context.settings().shouldDeleteBrowsingDataOnQuit
     private val shouldUseBottomToolbar = context.settings().shouldUseBottomToolbar
     private val accountManager = FenixAccountManager(context, lifecycleOwner)
 
@@ -260,8 +261,6 @@ open class DefaultToolbarMenu(
         // Predicates that are called once, during screen init
         val shouldShowSaveToCollection = (context.asActivity() as? HomeActivity)
             ?.browsingModeManager?.mode == BrowsingMode.Normal
-        val shouldDeleteDataOnQuit = context.components.settings
-            .shouldDeleteBrowsingDataOnQuit
 
         val menuItems =
             listOfNotNull(
@@ -345,7 +344,7 @@ open class DefaultToolbarMenu(
         }
     }
 
-    private fun getSetDefaultBrowserItem(): BrowserMenuImageText? {
+    internal fun getSetDefaultBrowserItem(): BrowserMenuImageText? {
         val experiments = context.components.analytics.experiments
         val browsers = BrowsersCache.all(context)
 
