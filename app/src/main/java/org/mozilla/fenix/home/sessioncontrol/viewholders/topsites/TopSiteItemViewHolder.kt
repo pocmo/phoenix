@@ -80,10 +80,38 @@ class TopSiteItemViewHolder(
                 favicon_image.setImageDrawable(getDrawable(itemView.context, R.drawable.ic_baidu))
             }
             SupportUtils.JD_URL -> {
-                favicon_image.setImageDrawable(getDrawable(itemView.context, R.drawable.ic_jd))
+                if (SupportUtils.isShoppingFes) {
+                    favicon_image.setImageDrawable(
+                        getDrawable(
+                            itemView.context,
+                            R.drawable.ic_jd618
+                        )
+                    )
+                } else {
+                    favicon_image.setImageDrawable(
+                        getDrawable(
+                            itemView.context,
+                            R.drawable.ic_jd
+                        )
+                    )
+                }
             }
             SupportUtils.PDD_URL -> {
-                favicon_image.setImageDrawable(getDrawable(itemView.context, R.drawable.ic_pdd))
+                if (SupportUtils.isShoppingFes) {
+                    favicon_image.setImageDrawable(
+                        getDrawable(
+                            itemView.context,
+                            R.drawable.ic_pdd618
+                        )
+                    )
+                } else {
+                    favicon_image.setImageDrawable(
+                        getDrawable(
+                            itemView.context,
+                            R.drawable.ic_pdd
+                        )
+                    )
+                }
             }
             else -> {
                 itemView.context.components.core.icons.loadIntoView(favicon_image, topSite.url)
