@@ -40,11 +40,11 @@ object Versions {
     const val installreferrer = "1.0"
 
     const val junit = "5.5.2"
-    const val mockk = "1.10.0"
+    const val mockk = "1.10.6"
 
     const val mockwebserver = "4.9.0"
     const val uiautomator = "2.2.0"
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.5.1"
 
     const val google_ads_id_version = "16.0.0"
 
