@@ -31,7 +31,6 @@ import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.helpers.FenixRobolectricTestRunner
-import org.mozilla.fenix.helpers.everyComponents
 import org.mozilla.fenix.utils.Settings
 import org.robolectric.Robolectric
 
@@ -106,9 +105,7 @@ class HomeActivityTest {
 
         val settings: Settings = mockk()
         every { settings.shouldReturnToBrowser } returns true
-        everyComponents {
-            activity.components.settings.shouldReturnToBrowser
-        } returns true
+        every { activity.components.settings.shouldReturnToBrowser } returns true
         every { activity.openToBrowser(any(), any()) } returns Unit
 
         activity.browsingModeManager = browsingModeManager
@@ -124,7 +121,7 @@ class HomeActivityTest {
 
         val settings: Settings = mockk()
         every { settings.shouldReturnToBrowser } returns true
-        everyComponents { activity.components.settings.shouldReturnToBrowser } returns true
+        every { activity.components.settings.shouldReturnToBrowser } returns true
         every { activity.openToBrowser(any(), any()) } returns Unit
 
         activity.browsingModeManager = browsingModeManager
