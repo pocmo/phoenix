@@ -37,7 +37,6 @@ import org.mozilla.fenix.components.FenixSnackbar
 import org.mozilla.fenix.components.TabCollectionStorage
 import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.components.metrics.MetricController
-import org.mozilla.fenix.components.toolbar.ToolbarMenu.Item
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.getRootView
 import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
@@ -52,7 +51,7 @@ import org.mozilla.fenix.utils.Settings
  * An interface that handles events from the BrowserToolbar menu, triggered by the Interactor
  */
 interface BrowserToolbarMenuController {
-    fun handleToolbarItemInteraction(item: Item)
+    fun handleToolbarItemInteraction(item: ToolbarMenu.Item)
 }
 
 @Suppress("LargeClass", "ForbiddenComment")
@@ -86,13 +85,13 @@ class DefaultBrowserToolbarMenuController(
     internal var ioScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     @Suppress("ComplexMethod", "LongMethod")
-    override fun handleToolbarItemInteraction(item: Item) {
+    override fun handleToolbarItemInteraction(item: ToolbarMenu.Item) {
         val sessionUseCases = activity.components.useCases.sessionUseCases
         val customTabUseCases = activity.components.useCases.customTabsUseCases
         trackToolbarItemInteraction(item)
 
         Do exhaustive when (item) {
-            is Item.InstallPwaToHomeScreen -> {
+            is ToolbarMenu.Item.InstallPwaToHomeScreen -> {
                 settings.installPwaOpened = true
                 MainScope().launch {
                     with(activity.components.useCases.webAppUseCases) {
@@ -106,7 +105,7 @@ class DefaultBrowserToolbarMenuController(
                     }
                 }
             }
-            is Item.OpenInFenix -> {
+            is ToolbarMenu.Item.OpenInFenix -> {
                 customTabSessionId?.let {
                     // Stop the SessionFeature from updating the EngineView and let it release the session
                     // from the EngineView so that it can immediately be rendered by a different view once
@@ -129,7 +128,7 @@ class DefaultBrowserToolbarMenuController(
                     activity.finishAndRemoveTask()
                 }
             }
-            is Item.OpenInApp -> {
+            is ToolbarMenu.Item.OpenInApp -> {
                 settings.openInAppOpened = true
 
                 val appLinksUseCases = activity.components.useCases.appLinksUseCases
@@ -140,7 +139,7 @@ class DefaultBrowserToolbarMenuController(
                     appLinksUseCases.openAppLink.invoke(redirect.appIntent)
                 }
             }
-            is Item.Quit -> {
+            is ToolbarMenu.Item.Quit -> {
                 // We need to show the snackbar while the browsing data is deleting (if "Delete
                 // browsing data on quit" is activated). After the deletion is over, the snackbar
                 // is dismissed.
@@ -155,11 +154,11 @@ class DefaultBrowserToolbarMenuController(
 
                 deleteAndQuit(activity, scope, snackbar)
             }
-            is Item.CustomizeReaderView -> {
+            is ToolbarMenu.Item.CustomizeReaderView -> {
                 readerModeController.showControls()
                 metrics.track(Event.ReaderModeAppearanceOpened)
             }
-            is Item.Back -> {
+            is ToolbarMenu.Item.Back -> {
                 if (item.viewHistory) {
                     navController.navigateBlockingForAsyncNavGraph(
                         BrowserFragmentDirections.actionGlobalTabHistoryDialogFragment(
@@ -172,7 +171,7 @@ class DefaultBrowserToolbarMenuController(
                     }
                 }
             }
-            is Item.Forward -> {
+            is ToolbarMenu.Item.Forward -> {
                 if (item.viewHistory) {
                     navController.navigateBlockingForAsyncNavGraph(
                         BrowserFragmentDirections.actionGlobalTabHistoryDialogFragment(
@@ -185,7 +184,7 @@ class DefaultBrowserToolbarMenuController(
                     }
                 }
             }
-            is Item.Reload -> {
+            is ToolbarMenu.Item.Reload -> {
                 val flags = if (item.bypassCache) {
                     LoadUrlFlags.select(LoadUrlFlags.BYPASS_CACHE)
                 } else {
@@ -196,12 +195,12 @@ class DefaultBrowserToolbarMenuController(
                     sessionUseCases.reload.invoke(it.id, flags = flags)
                 }
             }
-            is Item.Stop -> {
+            is ToolbarMenu.Item.Stop -> {
                 currentSession?.let {
                     sessionUseCases.stopLoading.invoke(it.id)
                 }
             }
-            is Item.Share -> {
+            is ToolbarMenu.Item.Share -> {
                 val directions = NavGraphDirections.actionGlobalShareFragment(
                     data = arrayOf(
                         ShareData(
@@ -213,11 +212,11 @@ class DefaultBrowserToolbarMenuController(
                 )
                 navController.navigateBlockingForAsyncNavGraph(directions)
             }
-            is Item.Settings -> browserAnimator.captureEngineViewAndDrawStatically {
+            is ToolbarMenu.Item.Settings -> browserAnimator.captureEngineViewAndDrawStatically {
                 val directions = BrowserFragmentDirections.actionBrowserFragmentToSettingsFragment()
                 navController.nav(R.id.browserFragment, directions)
             }
-            is Item.SyncedTabs -> browserAnimator.captureEngineViewAndDrawStatically {
+            is ToolbarMenu.Item.SyncedTabs -> browserAnimator.captureEngineViewAndDrawStatically {
                 navController.nav(
                     R.id.browserFragment,
                     BrowserFragmentDirections.actionBrowserFragmentToSyncedTabsFragment()
@@ -236,7 +235,7 @@ class DefaultBrowserToolbarMenuController(
                     )
                 }
             }
-            is Item.RequestDesktop -> {
+            is ToolbarMenu.Item.RequestDesktop -> {
                 currentSession?.let {
                     sessionUseCases.requestDesktopSite.invoke(
                         item.isChecked,
@@ -244,7 +243,7 @@ class DefaultBrowserToolbarMenuController(
                     )
                 }
             }
-            is Item.AddToTopSites -> {
+            is ToolbarMenu.Item.AddToTopSites -> {
                 scope.launch {
                     val context = swipeRefresh.context
                     val numPinnedSites =
@@ -280,7 +279,7 @@ class DefaultBrowserToolbarMenuController(
                     }
                 }
             }
-            is Item.AddToHomeScreen -> {
+            is ToolbarMenu.Item.AddToHomeScreen -> {
                 settings.installPwaOpened = true
                 MainScope().launch {
                     with(activity.components.useCases.webAppUseCases) {
@@ -294,17 +293,17 @@ class DefaultBrowserToolbarMenuController(
                     }
                 }
             }
-            is Item.FindInPage -> {
+            is ToolbarMenu.Item.FindInPage -> {
                 findInPageLauncher()
                 metrics.track(Event.FindInPageOpened)
             }
-            is Item.AddonsManager -> browserAnimator.captureEngineViewAndDrawStatically {
+            is ToolbarMenu.Item.AddonsManager -> browserAnimator.captureEngineViewAndDrawStatically {
                 navController.nav(
                     R.id.browserFragment,
                     BrowserFragmentDirections.actionGlobalAddonsManagementFragment()
                 )
             }
-            is Item.SaveToCollection -> {
+            is ToolbarMenu.Item.SaveToCollection -> {
                 metrics
                     .track(Event.CollectionSaveButtonPressed(TELEMETRY_BROWSER_IDENTIFIER))
 
@@ -322,35 +321,35 @@ class DefaultBrowserToolbarMenuController(
                     navController.nav(R.id.browserFragment, directions)
                 }
             }
-            is Item.Bookmark -> {
+            is ToolbarMenu.Item.Bookmark -> {
                 store.state.selectedTab?.let {
                     getProperUrl(it)?.let { url -> bookmarkTapped(url, it.content.title) }
                 }
             }
-            is Item.Bookmarks -> browserAnimator.captureEngineViewAndDrawStatically {
+            is ToolbarMenu.Item.Bookmarks -> browserAnimator.captureEngineViewAndDrawStatically {
                 navController.nav(
                     R.id.browserFragment,
                     BrowserFragmentDirections.actionGlobalBookmarkFragment(BookmarkRoot.Mobile.id)
                 )
             }
-            is Item.History -> browserAnimator.captureEngineViewAndDrawStatically {
+            is ToolbarMenu.Item.History -> browserAnimator.captureEngineViewAndDrawStatically {
                 navController.nav(
                     R.id.browserFragment,
                     BrowserFragmentDirections.actionGlobalHistoryFragment()
                 )
             }
-            is Item.Downloads -> browserAnimator.captureEngineViewAndDrawStatically {
+            is ToolbarMenu.Item.Downloads -> browserAnimator.captureEngineViewAndDrawStatically {
                 navController.nav(
                     R.id.browserFragment,
                     BrowserFragmentDirections.actionGlobalDownloadsFragment()
                 )
             }
-            is Item.NewTab -> {
+            is ToolbarMenu.Item.NewTab -> {
                 navController.navigateBlockingForAsyncNavGraph(
                     BrowserFragmentDirections.actionGlobalHome(focusOnAddressBar = true)
                 )
             }
-            is Item.SetDefaultBrowser -> {
+            is ToolbarMenu.Item.SetDefaultBrowser -> {
                 metrics.track(Event.SetDefaultBrowserToolbarMenuClicked)
                 activity.openSetDefaultBrowserOption()
             }
@@ -369,44 +368,44 @@ class DefaultBrowserToolbarMenuController(
     }
 
     @Suppress("ComplexMethod")
-    private fun trackToolbarItemInteraction(item: Item) {
+    private fun trackToolbarItemInteraction(item: ToolbarMenu.Item) {
         val eventItem = when (item) {
-            is Item.OpenInFenix -> Event.BrowserMenuItemTapped.Item.OPEN_IN_FENIX
-            is Item.InstallPwaToHomeScreen ->
+            is ToolbarMenu.Item.OpenInFenix -> Event.BrowserMenuItemTapped.Item.OPEN_IN_FENIX
+            is ToolbarMenu.Item.InstallPwaToHomeScreen ->
                 Event.BrowserMenuItemTapped.Item.ADD_TO_HOMESCREEN
-            is Item.Quit -> Event.BrowserMenuItemTapped.Item.QUIT
-            is Item.OpenInApp -> Event.BrowserMenuItemTapped.Item.OPEN_IN_APP
-            is Item.CustomizeReaderView ->
+            is ToolbarMenu.Item.Quit -> Event.BrowserMenuItemTapped.Item.QUIT
+            is ToolbarMenu.Item.OpenInApp -> Event.BrowserMenuItemTapped.Item.OPEN_IN_APP
+            is ToolbarMenu.Item.CustomizeReaderView ->
                 Event.BrowserMenuItemTapped.Item.READER_MODE_APPEARANCE
-            is Item.Back -> Event.BrowserMenuItemTapped.Item.BACK
-            is Item.Forward -> Event.BrowserMenuItemTapped.Item.FORWARD
-            is Item.Reload -> Event.BrowserMenuItemTapped.Item.RELOAD
-            is Item.Stop -> Event.BrowserMenuItemTapped.Item.STOP
-            is Item.Share -> Event.BrowserMenuItemTapped.Item.SHARE
-            is Item.Settings -> Event.BrowserMenuItemTapped.Item.SETTINGS
-            is Item.RequestDesktop ->
+            is ToolbarMenu.Item.Back -> Event.BrowserMenuItemTapped.Item.BACK
+            is ToolbarMenu.Item.Forward -> Event.BrowserMenuItemTapped.Item.FORWARD
+            is ToolbarMenu.Item.Reload -> Event.BrowserMenuItemTapped.Item.RELOAD
+            is ToolbarMenu.Item.Stop -> Event.BrowserMenuItemTapped.Item.STOP
+            is ToolbarMenu.Item.Share -> Event.BrowserMenuItemTapped.Item.SHARE
+            is ToolbarMenu.Item.Settings -> Event.BrowserMenuItemTapped.Item.SETTINGS
+            is ToolbarMenu.Item.RequestDesktop ->
                 if (item.isChecked) {
                     Event.BrowserMenuItemTapped.Item.DESKTOP_VIEW_ON
                 } else {
                     Event.BrowserMenuItemTapped.Item.DESKTOP_VIEW_OFF
                 }
-            is Item.FindInPage -> Event.BrowserMenuItemTapped.Item.FIND_IN_PAGE
-            is Item.SaveToCollection ->
+            is ToolbarMenu.Item.FindInPage -> Event.BrowserMenuItemTapped.Item.FIND_IN_PAGE
+            is ToolbarMenu.Item.SaveToCollection ->
                 Event.BrowserMenuItemTapped.Item.SAVE_TO_COLLECTION
-            is Item.AddToTopSites ->
+            is ToolbarMenu.Item.AddToTopSites ->
                 Event.BrowserMenuItemTapped.Item.ADD_TO_TOP_SITES
-            is Item.AddToHomeScreen ->
+            is ToolbarMenu.Item.AddToHomeScreen ->
                 Event.BrowserMenuItemTapped.Item.ADD_TO_HOMESCREEN
-            is Item.SyncedTabs -> Event.BrowserMenuItemTapped.Item.SYNC_TABS
-            is Item.SyncAccount -> Event.BrowserMenuItemTapped.Item.SYNC_ACCOUNT
-            is Item.Bookmark -> Event.BrowserMenuItemTapped.Item.BOOKMARK
-            is Item.AddonsManager ->
+            is ToolbarMenu.Item.SyncedTabs -> Event.BrowserMenuItemTapped.Item.SYNC_TABS
+            is ToolbarMenu.Item.SyncAccount -> Event.BrowserMenuItemTapped.Item.SYNC_ACCOUNT
+            is ToolbarMenu.Item.Bookmark -> Event.BrowserMenuItemTapped.Item.BOOKMARK
+            is ToolbarMenu.Item.AddonsManager ->
                 Event.BrowserMenuItemTapped.Item.ADDONS_MANAGER
-            is Item.Bookmarks -> Event.BrowserMenuItemTapped.Item.BOOKMARKS
-            is Item.History -> Event.BrowserMenuItemTapped.Item.HISTORY
-            is Item.Downloads -> Event.BrowserMenuItemTapped.Item.DOWNLOADS
-            is Item.NewTab -> Event.BrowserMenuItemTapped.Item.NEW_TAB
-            is Item.SetDefaultBrowser ->
+            is ToolbarMenu.Item.Bookmarks -> Event.BrowserMenuItemTapped.Item.BOOKMARKS
+            is ToolbarMenu.Item.History -> Event.BrowserMenuItemTapped.Item.HISTORY
+            is ToolbarMenu.Item.Downloads -> Event.BrowserMenuItemTapped.Item.DOWNLOADS
+            is ToolbarMenu.Item.NewTab -> Event.BrowserMenuItemTapped.Item.NEW_TAB
+            is ToolbarMenu.Item.SetDefaultBrowser ->
                 Event.BrowserMenuItemTapped.Item.SET_DEFAULT_BROWSER
         }
 

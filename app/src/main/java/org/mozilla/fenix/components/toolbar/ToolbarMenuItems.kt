@@ -29,7 +29,7 @@ import org.mozilla.fenix.theme.ThemeManager
  * @param hasAccountProblem If true, there was a problem signing into the Firefox account.
  * @param onItemTapped Called when a menu item is tapped.
  * @param primaryTextColor The text color used for the items.
- * @param accentBrightTextColor The accent color used for the items.
+ * @param accentTextColor The accent color used for the items.
  */
 @Suppress("LargeClass", "LongParameterList")
 open class ToolbarMenuItems(
@@ -39,7 +39,7 @@ open class ToolbarMenuItems(
     hasAccountProblem: Boolean = false,
     private val onItemTapped: (ToolbarMenu.Item) -> Unit = {},
     @ColorRes val primaryTextColor: Int,
-    @ColorRes val accentBrightTextColor: Int
+    @ColorRes val accentTextColor: Int
 ) {
     private val selectedSession: TabSessionState?
         get() = store.state.selectedTab

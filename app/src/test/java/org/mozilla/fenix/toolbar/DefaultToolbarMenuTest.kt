@@ -122,8 +122,8 @@ class DefaultToolbarMenuTest {
         val menuItems = toolbarMenu.coreMenuItems
         assertNotNull(menuItems)
 
-            val firstItem = menuItems[0]
-            val navToolbar = toolbarMenu.menuToolbarNavigation
+        val firstItem = menuItems[0]
+        val navToolbar = toolbarMenu.menuToolbarNavigation
 
         assertEquals(navToolbar, firstItem)
     }
@@ -137,8 +137,8 @@ class DefaultToolbarMenuTest {
         val menuItems = toolbarMenu.coreMenuItems
         assertNotNull(menuItems)
 
-            val lastItem = menuItems[menuItems.size - 1]
-            val navToolbar = toolbarMenu.menuToolbarNavigation
+        val lastItem = menuItems[menuItems.size - 1]
+        val navToolbar = toolbarMenu.menuToolbarNavigation
 
         assertEquals(navToolbar, lastItem)
     }

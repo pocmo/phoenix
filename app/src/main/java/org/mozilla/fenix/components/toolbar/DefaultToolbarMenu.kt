@@ -81,7 +81,8 @@ open class DefaultToolbarMenu(
     internal val primaryTextColor = ThemeManager.resolveAttribute(R.attr.primaryText, context)
 
     @ColorRes
-    internal val accentBrightTextColor = ThemeManager.resolveAttribute(R.attr.accentBright, context)
+    internal val accentTextColor =
+        ThemeManager.resolveAttribute(R.attr.menuItemButtonTintColor, context)
 
     internal val toolbarMenuItems = ToolbarMenuItems(
         context,
@@ -90,7 +91,7 @@ open class DefaultToolbarMenu(
         hasAccountProblem,
         onItemTapped,
         primaryTextColor,
-        accentBrightTextColor
+        accentTextColor
     )
 
     override val menuBuilder by lazy {
@@ -175,7 +176,7 @@ open class DefaultToolbarMenu(
         },
         primaryStateIconResource = R.drawable.ic_bookmark_outline,
         secondaryStateIconResource = R.drawable.ic_bookmark_filled,
-        tintColorResource = accentBrightTextColor,
+        tintColorResource = accentTextColor,
         primaryLabel = context.getString(R.string.browser_menu_add),
         secondaryLabel = context.getString(R.string.browser_menu_edit),
         isInPrimaryState = { !isCurrentUrlBookmarked }
@@ -222,14 +223,12 @@ open class DefaultToolbarMenu(
     }
 
     init {
-        // Report initial state.
         onMenuBuilderChanged(BrowserMenuBuilder(coreMenuItems))
 
-        // Observe account state changes, and update menu item builder with a new set of items.
-//        accountManager.observeAccountState(
-//            menuItems = menuItems,
-//            onMenuBuilderChanged = onMenuBuilderChanged
-//        )
+        accountManager.observeAccountState(
+            menuItems = coreMenuItems,
+            onMenuBuilderChanged = onMenuBuilderChanged
+        )
     }
 
     private fun handleBookmarkItemTapped() {
