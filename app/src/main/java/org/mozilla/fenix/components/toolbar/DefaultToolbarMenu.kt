@@ -53,6 +53,8 @@ import org.mozilla.fenix.utils.BrowsersCache
  * @param onItemTapped Called when a menu item is tapped.
  * @param lifecycleOwner View lifecycle owner used to determine when to cancel UI jobs.
  * @param bookmarksStorage Used to check if a page is bookmarked.
+ * @param isPinningSupported Whether pinning is supported for install or add to homescreen.
+ * @param onMenuBuilderChanged Defines behavior when menu items have changed.
  */
 @Suppress("LongParameterList", "TooManyFunctions")
 @ExperimentalCoroutinesApi

@@ -159,14 +159,6 @@ open class ToolbarMenuItems(
         onItemTapped.invoke(ToolbarMenu.Item.SyncAccount(accountManager.signedInToFxa()))
     }
 
-    val oldSyncedTabsItem = BrowserMenuImageText(
-        label = context.getString(R.string.synced_tabs),
-        imageResource = R.drawable.ic_synced_tabs,
-        iconTintColorResource = primaryTextColor
-    ) {
-        onItemTapped.invoke(ToolbarMenu.Item.SyncedTabs)
-    }
-
     val findInPageItem = BrowserMenuImageText(
         label = context.getString(R.string.browser_menu_find_in_page),
         imageResource = R.drawable.mozac_ic_search,
@@ -256,21 +248,5 @@ open class ToolbarMenuItems(
         iconTintColorResource = primaryTextColor
     ) {
         onItemTapped.invoke(ToolbarMenu.Item.Quit)
-    }
-
-    val oldAddToHomescreenItem = BrowserMenuImageText(
-        label = context.getString(R.string.browser_menu_add_to_homescreen),
-        imageResource = R.drawable.ic_add_to_homescreen,
-        iconTintColorResource = primaryTextColor
-    ) {
-        onItemTapped.invoke(ToolbarMenu.Item.AddToHomeScreen)
-    }
-
-    val oldReaderViewAppearanceItem = BrowserMenuImageText(
-        label = context.getString(R.string.browser_menu_read_appearance),
-        imageResource = R.drawable.ic_readermode_appearance,
-        iconTintColorResource = primaryTextColor
-    ) {
-        onItemTapped.invoke(ToolbarMenu.Item.CustomizeReaderView)
     }
 }
