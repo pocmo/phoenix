@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import kotlinx.android.synthetic.main.fragment_saved_cards.view.*
@@ -17,8 +16,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import mozilla.components.lib.state.ext.consumeFrom
 import org.mozilla.fenix.R
+import org.mozilla.fenix.SecureFragment
 import org.mozilla.fenix.components.StoreProvider
 import org.mozilla.fenix.ext.components
+import org.mozilla.fenix.ext.redirectToReAuth
 import org.mozilla.fenix.ext.showToolbar
 import org.mozilla.fenix.settings.creditcards.controller.DefaultCreditCardsManagementController
 import org.mozilla.fenix.settings.creditcards.interactor.CreditCardsManagementInteractor
@@ -28,7 +29,7 @@ import org.mozilla.fenix.settings.creditcards.view.CreditCardsManagementView
 /**
  * Displays a list of saved credit cards.
  */
-class CreditCardsManagementFragment : Fragment() {
+class CreditCardsManagementFragment : SecureFragment() {
 
     private lateinit var creditCardsStore: CreditCardsFragmentStore
     private lateinit var interactor: CreditCardsManagementInteractor
@@ -61,6 +62,11 @@ class CreditCardsManagementFragment : Fragment() {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         consumeFrom(creditCardsStore) { state ->
+            if (!state.isLoading && state.creditCards.isEmpty()) {
+                findNavController().popBackStack()
+                return@consumeFrom
+            }
+
             creditCardsView.update(state)
         }
     }
@@ -68,6 +74,20 @@ class CreditCardsManagementFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         showToolbar(getString(R.string.credit_cards_saved_cards))
+    }
+
+    /**
+     * When the fragment is paused, navigate back to the settings page to reauthenticate.
+     */
+    override fun onPause() {
+        // Don't redirect if the user is navigating to the credit card editor fragment.
+        redirectToReAuth(
+            listOf(R.id.creditCardEditorFragment),
+            findNavController().currentDestination?.id,
+            R.id.creditCardsManagementFragment
+        )
+
+        super.onPause()
     }
 
     /**

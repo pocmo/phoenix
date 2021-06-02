@@ -419,6 +419,11 @@
         and the third is the device model. -->
     <string name="default_device_name_2">在 %2$s %3$s 上的 %1$s</string>
 
+    <!-- Preference for syncing credit cards -->
+    <string name="preferences_sync_credit_cards">信用卡</string>
+    <!-- Preference for syncing addresses -->
+    <string name="preferences_sync_address">地址</string>
+
     <!-- Send Tab -->
     <!-- Name of the "receive tabs" notification channel. Displayed in the "App notifications" system settings for the app -->
     <string name="fxa_received_tab_channel_name">收到分頁</string>
@@ -1550,7 +1555,7 @@
     <!-- Title of warning dialog if users have no device authentication set up -->
     <string name="logins_warning_dialog_title">保護您的登入資訊與密碼</string>
     <!-- Message of warning dialog if users have no device authentication set up -->
-    <string name="logins_warning_dialog_message">設定裝備解鎖圖形、PIN 碼或密碼來保護您儲存下來的登入資訊與密碼，避免別人盜用。</string>
+    <string name="logins_warning_dialog_message">設定裝置解鎖圖形、PIN 碼或密碼來保護您儲存下來的登入資訊與密碼，避免別人盜用。</string>
     <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
     <string name="logins_warning_dialog_later">稍後處理</string>
     <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
@@ -1614,6 +1619,22 @@
 
     <!-- Error message for credit card number validation -->
     <string name="credit_cards_number_validation_error_message">請輸入有效的信用卡號</string>
+
+    <!-- Message displayed in biometric prompt displayed for authentication before allowing users to view their saved credit cards -->
+    <string name="credit_cards_biometric_prompt_message">解鎖後即可檢視儲存的卡片資訊</string>
+    <!-- Title of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_title">保護您的信用卡資訊</string>
+    <!-- Message of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_message">設定裝置解鎖圖形、PIN 碼或密碼來保護您儲存的信用卡資訊，避免別人盜用。</string>
+    <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_set_up_now">立即設定</string>
+    <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_later">稍後再設</string>
+    <!-- Title of PIN verification dialog to direct users to re-enter their device credentials to access their credit cards -->
+    <string name="credit_cards_biometric_prompt_message_pin">裝置解鎖</string>
+
+    <!-- Message displayed in biometric prompt for authentication, before allowing users to use their stored credit card information -->
+    <string name="credit_cards_biometric_prompt_unlock_message">解鎖後，即可使用儲存的信用卡資訊</string>
 
     <!-- Title of the Add search engine screen -->
     <string name="search_engine_add_custom_search_engine_title">新增搜尋引擎</string>
@@ -1782,4 +1803,10 @@
     <!-- Content description radio buttons with a link to more information -->
     <string name="radio_preference_info_content_description">點這裡取得詳細資訊</string>
 
-    </resources>
+    <!-- Content description for the action bar "up" button -->
+    <string name="action_bar_up_description">向上導航</string>
+
+    <!-- Content description for privacy content close button -->
+    <string name="privacy_content_close_button_content_description">關閉</string>
+
+</resources>

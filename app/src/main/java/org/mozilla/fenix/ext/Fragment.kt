@@ -4,6 +4,7 @@
 
 package org.mozilla.fenix.ext
 
+import android.view.WindowManager
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,7 @@ fun Fragment.getPreferenceKey(@StringRes resourceId: Int): String = getString(re
  */
 fun Fragment.showToolbar(title: String) {
     (requireActivity() as AppCompatActivity).title = title
+    activity?.setNavigationIcon(R.drawable.ic_back_button)
     (activity as NavHostActivity).getSupportActionBarAndInflateIfNecessary().show()
 }
 
@@ -58,15 +60,29 @@ fun Fragment.hideToolbar() {
 }
 
 /**
- * Pops the backstack to force users to re-auth if they put the app in the background and return to it
- * while being inside the saved logins flow
+ * Pops the backstack to force users to re-auth if they put the app in the background and return to
+ * it while being inside a secured flow (e.g. logins or credit cards).
  *
- * Does nothing if the user is currently navigating to any of the [destinations] given as a parameter
- *
+ * Does nothing if the user is currently navigating to any of the [destinations] given as a
+ * parameter.
  */
-fun Fragment.redirectToReAuth(destinations: List<Int>, currentDestination: Int?) {
+fun Fragment.redirectToReAuth(
+    destinations: List<Int>,
+    currentDestination: Int?,
+    currentLocation: Int
+) {
     if (currentDestination !in destinations) {
-        findNavController().popBackStack(R.id.savedLoginsAuthFragment, false)
+        when (currentLocation) {
+            R.id.loginDetailFragment,
+            R.id.editLoginFragment,
+            R.id.savedLoginsFragment -> {
+                findNavController().popBackStack(R.id.savedLoginsAuthFragment, false)
+            }
+            R.id.creditCardEditorFragment,
+            R.id.creditCardsManagementFragment -> {
+                findNavController().popBackStack(R.id.creditCardsSettingFragment, false)
+            }
+        }
     }
 }
 
@@ -87,5 +103,23 @@ fun Fragment.breadcrumb(
             ),
             level = Breadcrumb.Level.INFO
         )
+    )
+}
+
+/**
+ * Sets the [WindowManager.LayoutParams.FLAG_SECURE] flag for the current activity window.
+ */
+fun Fragment.secure() {
+    this.activity?.window?.addFlags(
+        WindowManager.LayoutParams.FLAG_SECURE
+    )
+}
+
+/**
+ * Clears the [WindowManager.LayoutParams.FLAG_SECURE] flag for the current activity window.
+ */
+fun Fragment.removeSecure() {
+    this.activity?.window?.clearFlags(
+        WindowManager.LayoutParams.FLAG_SECURE
     )
 }

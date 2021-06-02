@@ -417,6 +417,11 @@
         and the third is the device model. -->
     <string name="default_device_name_2">%1$s sur %2$s %3$s</string>
 
+    <!-- Preference for syncing credit cards -->
+    <string name="preferences_sync_credit_cards">Cartes bancaires</string>
+    <!-- Preference for syncing addresses -->
+    <string name="preferences_sync_address">Adresses</string>
+
     <!-- Send Tab -->
     <!-- Name of the "receive tabs" notification channel. Displayed in the "App notifications" system settings for the app -->
     <string name="fxa_received_tab_channel_name">Onglets reçus</string>
@@ -1619,6 +1624,21 @@ Cependant, il peut être moins stable. Téléchargez la version bêta de notre n
     <!-- Error message for credit card number validation -->
     <string name="credit_cards_number_validation_error_message">Veuillez saisir un numéro de carte bancaire valide</string>
 
+    <!-- Message displayed in biometric prompt displayed for authentication before allowing users to view their saved credit cards -->
+    <string name="credit_cards_biometric_prompt_message">Déverrouillez pour afficher vos cartes enregistrées</string>
+    <!-- Title of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_title">Protégez vos cartes bancaires</string>
+    <!-- Message of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_message">Configurez un schéma de verrouillage, un code PIN ou un mot de passe pour protéger vos cartes bancaires enregistrées si jamais quelqu’un accède à votre appareil.</string>
+    <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_set_up_now">Configurer maintenant</string>
+    <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_later">Plus tard</string>
+    <!-- Title of PIN verification dialog to direct users to re-enter their device credentials to access their credit cards -->
+    <string name="credit_cards_biometric_prompt_message_pin">Déverrouillez votre appareil</string>
+    <!-- Message displayed in biometric prompt for authentication, before allowing users to use their stored credit card information -->
+    <string name="credit_cards_biometric_prompt_unlock_message">Déverrouillez pour utiliser les informations de cartes bancaires enregistrées</string>
+
     <!-- Title of the Add search engine screen -->
     <string name="search_engine_add_custom_search_engine_title">Ajouter un moteur de recherche</string>
     <!-- Title of the Edit search engine screen -->
@@ -1786,4 +1806,10 @@ Cependant, il peut être moins stable. Téléchargez la version bêta de notre n
     <!-- Content description radio buttons with a link to more information -->
     <string name="radio_preference_info_content_description">Cliquez pour plus de précisions</string>
 
-    </resources>
+    <!-- Content description for the action bar "up" button -->
+    <string name="action_bar_up_description">Remonter</string>
+
+    <!-- Content description for privacy content close button -->
+    <string name="privacy_content_close_button_content_description">Fermer</string>
+
+</resources>

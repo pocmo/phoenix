@@ -141,7 +141,11 @@ open class FenixApplication : LocaleAwareApplication(), Provider {
             buildInfo = GleanBuildInfo.buildInfo
         )
 
-        setStartupMetrics(components.core.store, settings())
+        // We avoid blocking the main thread on startup by setting startup metrics on the background thread.
+        val store = components.core.store
+        GlobalScope.launch(Dispatchers.IO) {
+            setStartupMetrics(store, settings())
+        }
     }
 
     @CallSuper
@@ -239,6 +243,7 @@ open class FenixApplication : LocaleAwareApplication(), Provider {
                         components.core.historyStorage.warmUp()
                         components.core.bookmarksStorage.warmUp()
                         components.core.passwordsStorage.warmUp()
+                        components.core.autofillStorage.warmUp()
                     }
 
                     SecurePrefsTelemetry(this@FenixApplication, components.analytics.experiments).startTests()
@@ -560,6 +565,18 @@ open class FenixApplication : LocaleAwareApplication(), Provider {
                 topSitesCount.add(topSitesSize)
             }
 
+            if (settings.creditCardsSavedCount > 0) {
+                creditCardsSavedCount.add(settings.creditCardsSavedCount)
+            }
+
+            if (settings.creditCardsDeletedCount > 0) {
+                creditCardsDeletedCount.add(settings.creditCardsDeletedCount)
+            }
+
+            if (settings.creditCardsAutofilledCount > 0) {
+                creditCardsAutofillCount.add(settings.creditCardsAutofilledCount)
+            }
+
             val installedAddonSize = settings.installedAddonsCount
             Addons.hasInstalledAddons.set(installedAddonSize > 0)
             if (installedAddonSize > 0) {
@@ -622,10 +639,7 @@ open class FenixApplication : LocaleAwareApplication(), Provider {
             privateSearchSuggestions.set(settings.shouldShowSearchSuggestionsInPrivate)
             voiceSearchEnabled.set(settings.shouldShowVoiceSearch)
             openLinksInAppEnabled.set(settings.openLinksInExternalApp)
-
-            val isLoggedIn =
-                components.backgroundServices.accountManager.accountProfile() != null
-            signedInSync.set(isLoggedIn)
+            signedInSync.set(settings.signedInFxaAccount)
 
             val syncedItems = SyncEnginesStorage(applicationContext).getStatus().entries.filter {
                 it.value

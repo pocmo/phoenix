@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 import org.mozilla.fenix.helpers.FenixRobolectricTestRunner
 import org.mozilla.fenix.selection.SelectionHolder
 import org.mozilla.fenix.tabstray.TabsTrayStore
-import org.mozilla.fenix.tabstray.TabsTrayViewHolder
 
 @RunWith(FenixRobolectricTestRunner::class)
 class BrowserTabsAdapterTest {
@@ -29,7 +28,7 @@ class BrowserTabsAdapterTest {
     @Test
     fun `WHEN bind with payloads is called THEN update the holder`() {
         val adapter = BrowserTabsAdapter(context, interactor, store)
-        val holder = mockk<TabsTrayViewHolder>(relaxed = true)
+        val holder = mockk<AbstractBrowserTabViewHolder>(relaxed = true)
 
         adapter.updateTabs(Tabs(
             list = listOf(
@@ -50,7 +49,7 @@ class BrowserTabsAdapterTest {
     @Test
     fun `WHEN the selection holder is set THEN update the selected tab`() {
         val adapter = BrowserTabsAdapter(context, interactor, store)
-        val holder = mockk<TabsTrayViewHolder>(relaxed = true)
+        val holder = mockk<AbstractBrowserTabViewHolder>(relaxed = true)
         val tab = createTab("tab1")
 
         every { holder.tab }.answers { tab }

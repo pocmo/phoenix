@@ -489,6 +489,7 @@ dependencies {
 
     implementation Deps.mozilla_lib_crash
     implementation Deps.mozilla_lib_push_firebase
+    implementation Deps.mozilla_lib_state
     implementation Deps.mozilla_lib_dataprotect
     debugImplementation Deps.leakcanary
 
@@ -519,6 +520,8 @@ dependencies {
     androidTestImplementation Deps.uiautomator
 // Removed pending AndroidX fixes
     androidTestImplementation "tools.fastlane:screengrab:2.0.0"
+    // This Falcon version is added to maven central now required for Screengrab
+    implementation 'com.jraska:falcon:2.2.0'
 //    androidTestImplementation "br.com.concretesolutions:kappuccino:1.2.1"
 
     androidTestImplementation Deps.espresso_core, {

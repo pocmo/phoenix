@@ -214,7 +214,7 @@
     <!-- Button in the search suggestions onboarding that does not allow search suggestions in private sessions -->
     <string name="search_suggestions_onboarding_do_not_allow_button">Иҷозат дода нашавад</string>
     <!-- Search suggestion onboarding hint title text -->
-    <string name="search_suggestions_onboarding_title">Ба пешниҳодҳои ҷустуҷӯ дар ҷаласаҳои махфӣ иҷозат диҳед?</string>
+    <string name="search_suggestions_onboarding_title">Ба пешниҳодҳои ҷустуҷӯ дар ҷаласаҳои махфӣ иҷозат медиҳед?</string>
     <!-- Search suggestion onboarding hint description text, first parameter is the name of the app defined in app_name (for example: Fenix)-->
     <string name="search_suggestions_onboarding_text">%s ба низоми ҷустуҷӯии пешфарз ҳамаи он чизеро, ки шумо ба навори нишонӣ ворид мекунед, мефиристонад.</string>
     <!-- Search suggestion onboarding hint Learn more link text -->
@@ -410,6 +410,11 @@
         The first parameter is the application name, the second is the device manufacturer name
         and the third is the device model. -->
     <string name="default_device_name_2">%1$s дар %2$s %3$s</string>
+
+    <!-- Preference for syncing credit cards -->
+    <string name="preferences_sync_credit_cards">Кортҳои кредитӣ</string>
+    <!-- Preference for syncing addresses -->
+    <string name="preferences_sync_address">Нишониҳо</string>
 
     <!-- Send Tab -->
     <!-- Name of the "receive tabs" notification channel. Displayed in the "App notifications" system settings for the app -->
@@ -1340,7 +1345,7 @@
     <!-- Preference for enhanced tracking protection for the custom protection settings -->
     <string name="preference_enhanced_tracking_protection_custom_cryptominers">Криптомайнерҳо</string>
     <!-- Preference for enhanced tracking protection for the custom protection settings -->
-    <string name="preference_enhanced_tracking_protection_custom_fingerprinters">Хонандаи изи ангушт</string>
+    <string name="preference_enhanced_tracking_protection_custom_fingerprinters">Хонандаи нақши ангушт</string>
     <string name="enhanced_tracking_protection_blocked">Манъ карда мешавад</string>
     <!-- Header for categories that are being not being blocked by current Enhanced Tracking Protection settings -->
     <string name="enhanced_tracking_protection_allowed">Иҷозат дода мешавад</string>
@@ -1357,7 +1362,7 @@
     <!-- Description of cryptominers that can be blocked by Enhanced Tracking Protection -->
     <string name="etp_cryptominers_description">Скриптҳои зараровареро, ки дастгоҳи шуморо барои истеҳсоли пули рақамӣ дастрас мекунанд, пешгирӣ менамояд.</string>
     <!-- Category of trackers (fingerprinters) that can be blocked by Enhanced Tracking Protection -->
-    <string name="etp_fingerprinters_title">Хонандаи изи ангушт</string>
+    <string name="etp_fingerprinters_title">Хонандаи нақши ангушт</string>
     <!-- Description of fingerprinters that can be blocked by Enhanced Tracking Protection -->
     <string name="etp_fingerprinters_description">Ҷамъкунии маълумоти нодири муайяншавандаеро дар бораи дастгоҳи шумо, ки метавонад бо мақсадҳои пайгирӣ истифода шавад, манъ мекунад.</string>
     <!-- Category of trackers (tracking content) that can be blocked by Enhanced Tracking Protection -->
@@ -1450,10 +1455,8 @@
     <string name="preferences_passwords_autofill">Пуркунии худкор</string>
     <!-- Preference for syncing saved logins in Fenix -->
     <string name="preferences_passwords_sync_logins">Воридшавиҳои ҳамоҳангшуда</string>
-    <!-- Syncing saved logins in Fenix is on -->
-    <string name="preferences_passwords_sync_logins_on">Фаъол</string>
-    <!-- Syncing saved logins in Fenix is off -->
-    <string name="preferences_passwords_sync_logins_off">Ғайрифаъол</string>
+    <!-- Preference for syncing saved logins in Fenix, when not signed in-->
+    <string name="preferences_passwords_sync_logins_across_devices">Ҳамоҳанг кардани воридшавиҳо байни дастгоҳҳо</string>
     <!-- Syncing saved logins in Fenix needs reconnect to sync -->
     <string name="preferences_passwords_sync_logins_reconnect">Аз нав пайваст кардан</string>
     <!-- Syncing saved logins in Fenix needs login -->
@@ -1554,6 +1557,8 @@
     <string name="preferences_credit_cards_save_and_autofill_cards_summary">Маълумот рамзгузорӣ карда шуд</string>
     <!-- Preference option for syncing credit cards across devices. This is displayed when the user is not signed into sync -->
     <string name="preferences_credit_cards_sync_cards_across_devices">Ҳамоҳанг кардани кортҳо байни дастгоҳҳо</string>
+    <!-- Preference option for syncing credit cards across devices. This is displayed when the user is signed into sync -->
+    <string name="preferences_credit_cards_sync_cards">Ҳамоҳанг кардани кортҳо</string>
     <!-- Preference option for adding a credit card -->
     <string name="preferences_credit_cards_add_credit_card">Илова кардани корти насия</string>
 
@@ -1585,6 +1590,9 @@
 
     <!-- Title of the "Saved cards" screen -->
     <string name="credit_cards_saved_cards">Кортҳои нигоҳдошташуда</string>
+
+    <!-- Error message for credit card number validation -->
+    <string name="credit_cards_number_validation_error_message">Лутфан, рақами корти кредитии дурустро ворид намоед</string>
 
     <!-- Title of the Add search engine screen -->
     <string name="search_engine_add_custom_search_engine_title">Илова кардани низоми ҷустуҷӯӣ</string>
@@ -1753,4 +1761,10 @@
     <!-- Content description radio buttons with a link to more information -->
     <string name="radio_preference_info_content_description">Барои тафсилоти бештар зер кунед</string>
 
-    </resources>
+    <!-- Content description for the action bar "up" button -->
+    <string name="action_bar_up_description">Ба боло гузаред</string>
+
+    <!-- Content description for privacy content close button -->
+    <string name="privacy_content_close_button_content_description">Пӯшидан</string>
+
+</resources>

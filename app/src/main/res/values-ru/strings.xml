@@ -424,6 +424,11 @@
         and the third is the device model. -->
     <string name="default_device_name_2">%1$s на %2$s %3$s</string>
 
+    <!-- Preference for syncing credit cards -->
+    <string name="preferences_sync_credit_cards">Банковские карты</string>
+    <!-- Preference for syncing addresses -->
+    <string name="preferences_sync_address">Адреса</string>
+
     <!-- Send Tab -->
     <!-- Name of the "receive tabs" notification channel. Displayed in the "App notifications" system settings for the app -->
     <string name="fxa_received_tab_channel_name">Вкладки с других устройств</string>
@@ -1618,6 +1623,21 @@
     <!-- Error message for credit card number validation -->
     <string name="credit_cards_number_validation_error_message">Пожалуйста, введите корректный номер карты</string>
 
+    <!-- Message displayed in biometric prompt displayed for authentication before allowing users to view their saved credit cards -->
+    <string name="credit_cards_biometric_prompt_message">Разблокируйте, чтобы просмотреть сохранённые карты</string>
+    <!-- Title of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_title">Защитите свои банковские карты</string>
+    <!-- Message of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_message">Настройте графический ключ, PIN-код или пароль для блокировки устройства, чтобы защитить сохранённые банковские карты, если кто-либо ещё получит доступ к вашему устройству.</string>
+    <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_set_up_now">Настроить сейчас</string>
+    <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_later">Позже</string>
+    <!-- Title of PIN verification dialog to direct users to re-enter their device credentials to access their credit cards -->
+    <string name="credit_cards_biometric_prompt_message_pin">Разблокируйте своё устройство</string>
+    <!-- Message displayed in biometric prompt for authentication, before allowing users to use their stored credit card information -->
+    <string name="credit_cards_biometric_prompt_unlock_message">Разблокируйте, чтобы использовать сохранённые данные банковской карты</string>
+
     <!-- Title of the Add search engine screen -->
     <string name="search_engine_add_custom_search_engine_title">Добавление поисковой системы</string>
     <!-- Title of the Edit search engine screen -->
@@ -1785,4 +1805,10 @@
     <!-- Content description radio buttons with a link to more information -->
     <string name="radio_preference_info_content_description">Нажмите, чтобы узнать больше</string>
 
-    </resources>
+    <!-- Content description for the action bar "up" button -->
+    <string name="action_bar_up_description">Перейти наверх</string>
+
+    <!-- Content description for privacy content close button -->
+    <string name="privacy_content_close_button_content_description">Закрыть</string>
+
+</resources>

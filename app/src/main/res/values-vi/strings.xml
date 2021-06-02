@@ -412,6 +412,11 @@
         and the third is the device model. -->
     <string name="default_device_name_2">%1$s trên %2$s %3$s</string>
 
+    <!-- Preference for syncing credit cards -->
+    <string name="preferences_sync_credit_cards">Thẻ tín dụng</string>
+    <!-- Preference for syncing addresses -->
+    <string name="preferences_sync_address">Địa chỉ</string>
+
     <!-- Send Tab -->
     <!-- Name of the "receive tabs" notification channel. Displayed in the "App notifications" system settings for the app -->
     <string name="fxa_received_tab_channel_name">Các thẻ đã nhận</string>
@@ -1577,6 +1582,21 @@
     <!-- Error message for credit card number validation -->
     <string name="credit_cards_number_validation_error_message">Vui lòng nhập số thẻ tín dụng hợp lệ</string>
 
+    <!-- Message displayed in biometric prompt displayed for authentication before allowing users to view their saved credit cards -->
+    <string name="credit_cards_biometric_prompt_message">Mở khóa để xem các thẻ tín dụng đã lưu của bạn</string>
+    <!-- Title of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_title">Bảo mật thẻ tín dụng của bạn</string>
+    <!-- Message of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_message">Thiết lập màn hình khóa thiết bị với mẫu hình, mã PIN hoặc mật khẩu để bảo vệ thẻ tín dụng đã lưu của bạn không bị truy cập nếu người khác có thiết bị của bạn.</string>
+    <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_set_up_now">Thiết lập ngay</string>
+    <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_later">Để sau</string>
+    <!-- Title of PIN verification dialog to direct users to re-enter their device credentials to access their credit cards -->
+    <string name="credit_cards_biometric_prompt_message_pin">Mở khóa thiết bị của bạn</string>
+    <!-- Message displayed in biometric prompt for authentication, before allowing users to use their stored credit card information -->
+    <string name="credit_cards_biometric_prompt_unlock_message">Mở khóa để sử dụng thông tin thẻ tín dụng được lưu trữ</string>
+
     <!-- Title of the Add search engine screen -->
     <string name="search_engine_add_custom_search_engine_title">Thêm công cụ tìm kiếm</string>
     <!-- Title of the Edit search engine screen -->
@@ -1744,4 +1764,10 @@
     <!-- Content description radio buttons with a link to more information -->
     <string name="radio_preference_info_content_description">Chạm để biết thêm chi tiết</string>
 
-    </resources>
+    <!-- Content description for the action bar "up" button -->
+    <string name="action_bar_up_description">Điều hướng lên</string>
+
+    <!-- Content description for privacy content close button -->
+    <string name="privacy_content_close_button_content_description">Đóng</string>
+
+</resources>

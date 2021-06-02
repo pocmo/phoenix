@@ -23,6 +23,7 @@ import org.mozilla.fenix.BuildConfig
 import org.mozilla.fenix.Config
 import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.R
+import org.mozilla.fenix.autofill.AutofillConfirmActivity
 import org.mozilla.fenix.autofill.AutofillUnlockActivity
 import org.mozilla.fenix.components.metrics.AppStartupTelemetry
 import org.mozilla.fenix.ext.components
@@ -58,6 +59,7 @@ class Components(private val context: Context) {
             core.lazyBookmarksStorage,
             core.lazyPasswordsStorage,
             core.lazyRemoteTabsStorage,
+            core.lazyAutofillStorage,
             strictMode
         )
     }
@@ -169,7 +171,7 @@ class Components(private val context: Context) {
             storage = core.passwordsStorage,
             publicSuffixList = publicSuffixList,
             unlockActivity = AutofillUnlockActivity::class.java,
-            confirmActivity = AutofillConfiguration::class.java,
+            confirmActivity = AutofillConfirmActivity::class.java,
             applicationName = context.getString(R.string.app_name),
             httpClient = core.client
         )

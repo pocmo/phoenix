@@ -27,11 +27,10 @@ import org.mozilla.fenix.FeatureFlags
 import org.mozilla.fenix.FeatureFlags.tabsTrayRewrite
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.accounts.FenixAccountManager
-import org.mozilla.fenix.experiments.ExperimentBranch
-import org.mozilla.fenix.experiments.Experiments
+import org.mozilla.fenix.experiments.FeatureId
 import org.mozilla.fenix.ext.components
+import org.mozilla.fenix.ext.getVariables
 import org.mozilla.fenix.ext.settings
-import org.mozilla.fenix.ext.withExperiment
 import org.mozilla.fenix.theme.ThemeManager
 import org.mozilla.fenix.whatsnew.WhatsNew
 
@@ -133,39 +132,18 @@ class HomeMenu(
         ) {
             onItemTapped.invoke(Item.WhatsNew)
         }
-
         val experiments = context.components.analytics.experiments
-        val bookmarksIcon = experiments.withExperiment(Experiments.BOOKMARK_ICON) {
-            when (it) {
-                ExperimentBranch.TREATMENT -> R.drawable.ic_bookmark_list
-                else -> R.drawable.ic_bookmark_filled
-            }
-        }
         val bookmarksItem = BrowserMenuImageText(
             context.getString(R.string.library_bookmarks),
-            bookmarksIcon,
+            R.drawable.ic_bookmark_list,
             primaryTextColor
         ) {
             onItemTapped.invoke(Item.Bookmarks)
         }
 
-        // We want to validate that the Nimbus experiments library is working, from the android UI
-        // all the way back to the data science backend. We're not testing the user's preference
-        // or response, we're end-to-end testing the experiments platform.
-        // So here, we're running multiple identical branches with the same treatment, and if the
-        // user isn't targeted, then we get still get the same treatment.
-        // The `let` block is degenerate here, but left here so as to document the form of how experiments
-        // are implemented here.
-        val historyIcon = experiments.withExperiment(Experiments.A_A_NIMBUS_VALIDATION) {
-            when (it) {
-                ExperimentBranch.A1 -> R.drawable.ic_history
-                ExperimentBranch.A2 -> R.drawable.ic_history
-                else -> R.drawable.ic_history
-            }
-        }
         val historyItem = BrowserMenuImageText(
             context.getString(R.string.library_history),
-            historyIcon,
+            R.drawable.ic_history,
             primaryTextColor
         ) {
             onItemTapped.invoke(Item.History)
@@ -179,9 +157,11 @@ class HomeMenu(
             onItemTapped.invoke(Item.Extensions)
         }
 
+        // Use nimbus to set the icon and title.
+        val variables = experiments.getVariables(FeatureId.NIMBUS_VALIDATION)
         val settingsItem = BrowserMenuImageText(
-            context.getString(R.string.browser_menu_settings),
-            R.drawable.ic_settings,
+            variables.getText("settings-title") ?: context.getString(R.string.browser_menu_settings),
+            variables.getDrawableResource("settings-icon") ?: R.drawable.ic_settings,
             primaryTextColor
         ) {
             onItemTapped.invoke(Item.Settings)
@@ -251,37 +231,17 @@ class HomeMenu(
         val experiments = context.components.analytics.experiments
         val settings = context.components.settings
 
-        val bookmarksIcon = experiments.withExperiment(Experiments.BOOKMARK_ICON) {
-            when (it) {
-                ExperimentBranch.TREATMENT -> R.drawable.ic_bookmark_list
-                else -> R.drawable.ic_bookmark_filled
-            }
-        }
         val bookmarksItem = BrowserMenuImageText(
             context.getString(R.string.library_bookmarks),
-            bookmarksIcon,
+            R.drawable.ic_bookmark_list,
             primaryTextColor
         ) {
             onItemTapped.invoke(Item.Bookmarks)
         }
 
-        // We want to validate that the Nimbus experiments library is working, from the android UI
-        // all the way back to the data science backend. We're not testing the user's preference
-        // or response, we're end-to-end testing the experiments platform.
-        // So here, we're running multiple identical branches with the same treatment, and if the
-        // user isn't targeted, then we get still get the same treatment.
-        // The `let` block is degenerate here, but left here so as to document the form of how experiments
-        // are implemented here.
-        val historyIcon = experiments.withExperiment(Experiments.A_A_NIMBUS_VALIDATION) {
-            when (it) {
-                ExperimentBranch.A1 -> R.drawable.ic_history
-                ExperimentBranch.A2 -> R.drawable.ic_history
-                else -> R.drawable.ic_history
-            }
-        }
         val historyItem = BrowserMenuImageText(
             context.getString(R.string.library_history),
-            historyIcon,
+            R.drawable.ic_history,
             primaryTextColor
         ) {
             onItemTapped.invoke(Item.History)
@@ -323,9 +283,11 @@ class HomeMenu(
             onItemTapped.invoke(Item.Help)
         }
 
+        // Use nimbus to set the icon and title.
+        val variables = experiments.getVariables(FeatureId.NIMBUS_VALIDATION)
         val settingsItem = BrowserMenuImageText(
-            context.getString(R.string.browser_menu_settings),
-            R.drawable.ic_settings,
+            variables.getText("settings-title") ?: context.getString(R.string.browser_menu_settings),
+            variables.getDrawableResource("settings-icon") ?: R.drawable.ic_settings,
             primaryTextColor
         ) {
             onItemTapped.invoke(Item.Settings)

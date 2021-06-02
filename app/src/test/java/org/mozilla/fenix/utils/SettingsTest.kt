@@ -183,13 +183,13 @@ class SettingsTest {
     fun showLoginsDialogWarning() {
         // When just created
         // Then
-        assertEquals(0, settings.loginsSecureWarningCount.value)
+        assertEquals(0, settings.secureWarningCount.value)
 
         // When
-        settings.incrementShowLoginsSecureWarningCount()
+        settings.incrementSecureWarningCount()
 
         // Then
-        assertEquals(1, settings.loginsSecureWarningCount.value)
+        assertEquals(1, settings.secureWarningCount.value)
     }
 
     @Test
@@ -199,7 +199,7 @@ class SettingsTest {
         assertTrue(settings.shouldShowSecurityPinWarning)
 
         // When
-        settings.incrementShowLoginsSecureWarningCount()
+        settings.incrementSecureWarningCount()
 
         // Then
         assertFalse(settings.shouldShowSecurityPinWarning)
@@ -670,5 +670,24 @@ class SettingsTest {
         // Then
         assertEquals("testAmoUser", settings.overrideAmoUser)
         assertTrue(settings.amoCollectionOverrideConfigured())
+    }
+
+    @Test
+    fun creditCardsSavedCount() {
+        // When just created
+        // Then
+        assertEquals(0, settings.creditCardsSavedCount)
+
+        // When
+        settings.creditCardsSavedCount += 1
+
+        // Then
+        assertEquals(1, settings.creditCardsSavedCount)
+
+        // When
+        settings.creditCardsSavedCount += 1
+
+        // Then
+        assertEquals(2, settings.creditCardsSavedCount)
     }
 }

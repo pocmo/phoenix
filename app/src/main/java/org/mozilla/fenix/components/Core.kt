@@ -120,6 +120,7 @@ class Core(
             defaultSettings,
             GeckoProvider.getOrCreateRuntime(
                 context,
+                lazyAutofillStorage,
                 lazyPasswordsStorage,
                 trackingProtectionPolicyFactory.createTrackingProtectionPolicy()
             )
@@ -155,6 +156,7 @@ class Core(
             context,
             GeckoProvider.getOrCreateRuntime(
                 context,
+                lazyAutofillStorage,
                 lazyPasswordsStorage,
                 trackingProtectionPolicyFactory.createTrackingProtectionPolicy()
             )
@@ -292,7 +294,7 @@ class Core(
     val lazyHistoryStorage = lazyMonitored { PlacesHistoryStorage(context, crashReporter) }
     val lazyBookmarksStorage = lazyMonitored { PlacesBookmarksStorage(context) }
     val lazyPasswordsStorage = lazyMonitored { SyncableLoginsStorage(context, passwordsEncryptionKey) }
-    private val lazyAutofillStorage = lazyMonitored { AutofillCreditCardsAddressesStorage(context, lazySecurePrefs) }
+    val lazyAutofillStorage = lazyMonitored { AutofillCreditCardsAddressesStorage(context, lazySecurePrefs) }
 
     /**
      * The storage component to sync and persist tabs in a Firefox Sync account.

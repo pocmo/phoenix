@@ -14,7 +14,7 @@ object Versions {
     const val sentry = "1.7.10"
     const val leakcanary = "2.4"
     const val osslicenses_plugin = "0.9.5"
-    const val detekt = "1.9.1"
+    const val detekt = "1.17.1"
     const val jna = "5.6.0"
 
     const val androidx_appcompat = "1.2.0"
@@ -145,6 +145,7 @@ object Deps {
     const val mozilla_lib_crash = "org.mozilla.components:lib-crash:${Versions.mozilla_android_components}"
     const val mozilla_lib_push_firebase = "org.mozilla.components:lib-push-firebase:${Versions.mozilla_android_components}"
     const val mozilla_lib_dataprotect = "org.mozilla.components:lib-dataprotect:${Versions.mozilla_android_components}"
+    const val mozilla_lib_state = "org.mozilla.components:lib-state:${Versions.mozilla_android_components}"
 
     const val mozilla_lib_publicsuffixlist = "org.mozilla.components:lib-publicsuffixlist:${Versions.mozilla_android_components}"
 
@@ -247,8 +248,8 @@ object RepoMatching {
     /**
      * A matcher for com.google.android.* with one exception: the espresso-contrib dependency includes the
      * accessibility-test-framework dependency, which is not available in the google repo. As such, we must
-     * explicitly exclude it from this regex so it can be found on jcenter. Note that the transitive dependency
-     * com.google.guava is also not available on google's repo.
+     * explicitly exclude it from this regex so it can be found on Maven Central. Note that the transitive
+     * dependency com.google.guava is also not available on google's repo.
      */
     const val comGoogleAndroid = "com\\.google\\.android\\.(?!apps\\.common\\.testing\\.accessibility\\.framework).*"
 }

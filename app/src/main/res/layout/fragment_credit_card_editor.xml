@@ -83,6 +83,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif"
+                android:imeOptions="flagNoExtractUi"
                 android:letterSpacing="0.01"
                 android:lineSpacingExtra="8sp"
                 android:maxLines="1"
@@ -136,7 +137,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0.8"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatSpinner

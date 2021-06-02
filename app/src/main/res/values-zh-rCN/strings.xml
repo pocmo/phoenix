@@ -424,6 +424,12 @@
         and the third is the device model. -->
     <string name="default_device_name_2">%2$s %3$s 上的 %1$s</string>
 
+    <!-- Preference for syncing credit cards -->
+    <string name="preferences_sync_credit_cards">信用卡</string>
+
+    <!-- Preference for syncing addresses -->
+    <string name="preferences_sync_address">邮政地址</string>
+
     <!-- Send Tab -->
     <!-- Name of the "receive tabs" notification channel. Displayed in the "App notifications" system settings for the app -->
     <string name="fxa_received_tab_channel_name">收到标签页</string>
@@ -1627,6 +1633,23 @@
     <!-- Error message for credit card number validation -->
     <string name="credit_cards_number_validation_error_message">请输入有效的信用卡卡号</string>
 
+    <!-- Message displayed in biometric prompt displayed for authentication before allowing users to view their saved credit cards -->
+    <string name="credit_cards_biometric_prompt_message">解锁后即可查看保存的卡片信息</string>
+    <!-- Title of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_title">保护您的卡片信息</string>
+
+    <!-- Message of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_message">设置锁定方式、PIN 码或密码以保护您保存的卡片信息，避免他人盗用。</string>
+    <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_set_up_now">立即设置</string>
+    <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_later">以后再说</string>
+    <!-- Title of PIN verification dialog to direct users to re-enter their device credentials to access their credit cards -->
+    <string name="credit_cards_biometric_prompt_message_pin">解锁设备</string>
+
+    <!-- Message displayed in biometric prompt for authentication, before allowing users to use their stored credit card information -->
+    <string name="credit_cards_biometric_prompt_unlock_message">解锁以使用存储的卡片信息</string>
+
     <!-- Title of the Add search engine screen -->
     <string name="search_engine_add_custom_search_engine_title">添加搜索引擎</string>
     <!-- Title of the Edit search engine screen -->
@@ -1794,4 +1817,10 @@
     <!-- Content description radio buttons with a link to more information -->
     <string name="radio_preference_info_content_description">点击了解更多信息</string>
 
-    </resources>
+    <!-- Content description for the action bar "up" button -->
+    <string name="action_bar_up_description">向上导航</string>
+
+    <!-- Content description for privacy content close button -->
+    <string name="privacy_content_close_button_content_description">关闭</string>
+
+</resources>

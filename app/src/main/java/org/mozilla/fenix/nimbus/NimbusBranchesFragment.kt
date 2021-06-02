@@ -20,7 +20,6 @@ import org.mozilla.fenix.R
 import org.mozilla.fenix.components.StoreProvider
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.showToolbar
-import org.mozilla.fenix.ext.withExperiment
 import org.mozilla.fenix.nimbus.controller.NimbusBranchesController
 import org.mozilla.fenix.nimbus.view.NimbusBranchesView
 
@@ -79,7 +78,7 @@ class NimbusBranchesFragment : Fragment() {
             try {
                 val experiments = requireContext().components.analytics.experiments
                 val branches = experiments.getExperimentBranches(args.experimentId) ?: emptyList()
-                val selectedBranch = experiments.withExperiment(args.experimentId) ?: ""
+                val selectedBranch = experiments.getExperimentBranch(args.experimentId) ?: ""
 
                 nimbusBranchesStore.dispatch(
                     NimbusBranchesAction.UpdateBranches(

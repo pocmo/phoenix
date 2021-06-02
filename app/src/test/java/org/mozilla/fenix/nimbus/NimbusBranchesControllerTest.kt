@@ -7,11 +7,11 @@ package org.mozilla.fenix.nimbus
 import io.mockk.mockk
 import io.mockk.verify
 import mozilla.components.service.nimbus.NimbusApi
-import mozilla.components.support.test.mock
+import mozilla.components.support.test.libstate.ext.waitUntilIdle
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mozilla.experiments.nimbus.Branch
-import org.mozilla.experiments.nimbus.FeatureConfig
 import org.mozilla.fenix.nimbus.controller.NimbusBranchesController
 
 class NimbusBranchesControllerTest {
@@ -24,7 +24,7 @@ class NimbusBranchesControllerTest {
 
     @Before
     fun setup() {
-        nimbusBranchesStore = mock()
+        nimbusBranchesStore = NimbusBranchesStore(NimbusBranchesState(emptyList()))
         controller = NimbusBranchesController(nimbusBranchesStore, experiments, experimentId)
     }
 
@@ -32,18 +32,17 @@ class NimbusBranchesControllerTest {
     fun `WHEN branch item is clicked THEN branch is opted into and selectedBranch state is updated`() {
         val branch = Branch(
             slug = "slug",
-            ratio = 1,
-            feature = FeatureConfig(
-                featureId = "1",
-                enabled = true
-            )
+            ratio = 1
         )
 
         controller.onBranchItemClicked(branch)
 
+        nimbusBranchesStore.waitUntilIdle()
+
         verify {
             experiments.optInWithBranch(experimentId, branch.slug)
-            nimbusBranchesStore.dispatch(NimbusBranchesAction.UpdateSelectedBranch(branch.slug))
         }
+
+        assertEquals(branch.slug, nimbusBranchesStore.state.selectedBranch)
     }
 }
