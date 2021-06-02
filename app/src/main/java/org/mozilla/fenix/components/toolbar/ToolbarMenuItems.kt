@@ -7,7 +7,6 @@ package org.mozilla.fenix.components.toolbar
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat.getColor
-import androidx.lifecycle.LifecycleOwner
 import mozilla.components.browser.menu.BrowserMenuHighlight
 import mozilla.components.browser.menu.item.BrowserMenuHighlightableItem
 import mozilla.components.browser.menu.item.BrowserMenuImageSwitch
@@ -96,7 +95,7 @@ open class ToolbarMenuItems(
     }
 
     val shareItem = BrowserMenuItemToolbar.Button(
-        imageResource = R.drawable.ic_share_filled,
+        imageResource = R.drawable.ic_share,
         contentDescription = context.getString(R.string.browser_menu_share),
         iconTintColorResource = primaryTextColor,
         listener = {

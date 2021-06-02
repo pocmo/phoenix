@@ -30,8 +30,6 @@ import mozilla.components.concept.storage.BookmarksStorage
 import mozilla.components.feature.webcompat.reporter.WebCompatReporterFeature
 import mozilla.components.lib.state.ext.flowScoped
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
-import org.mozilla.fenix.FeatureFlags.tabsTrayRewrite
-import org.mozilla.fenix.FeatureFlags
 import org.mozilla.fenix.HomeActivity
 import org.mozilla.fenix.R
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
@@ -39,6 +37,7 @@ import org.mozilla.fenix.components.toolbar.ToolbarMenu.Item
 import org.mozilla.fenix.components.accounts.FenixAccountManager
 import org.mozilla.fenix.experiments.ExperimentBranch
 import org.mozilla.fenix.experiments.FeatureId
+import org.mozilla.fenix.ext.asActivity
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.withExperiment
@@ -118,27 +117,7 @@ open class DefaultToolbarMenu(
 
         registerForIsBookmarkedUpdates()
 
-        if (FeatureFlags.toolbarMenuFeature) {
-            BrowserMenuItemToolbar(listOf(back, forward, share, refresh), isSticky = true)
-        } else {
-            val bookmark = BrowserMenuItemToolbar.TwoStateButton(
-                primaryImageResource = R.drawable.ic_bookmark_filled,
-                primaryContentDescription = context.getString(R.string.browser_menu_edit_bookmark),
-                primaryImageTintResource = primaryTextColor,
-                // TwoStateButton.isInPrimaryState must be synchronous, and checking bookmark state is
-                // relatively slow. The best we can do here is periodically compute and cache a new "is
-                // bookmarked" state, and use that whenever the menu has been opened.
-                isInPrimaryState = { isCurrentUrlBookmarked },
-                secondaryImageResource = R.drawable.ic_bookmark_outline,
-                secondaryContentDescription = context.getString(R.string.browser_menu_bookmark),
-                secondaryImageTintResource = primaryTextColor,
-                disableInSecondaryState = false
-            ) {
-                handleBookmarkItemTapped()
-            }
-
-            BrowserMenuItemToolbar(listOf(back, forward, bookmark, share, refresh))
-        }
+        BrowserMenuItemToolbar(listOf(back, forward, share, refresh), isSticky = true)
     }
 
     // Predicates that need to be repeatedly called as the session changes
@@ -177,7 +156,6 @@ open class DefaultToolbarMenu(
     internal var saveToCollectionItem = toolbarMenuItems.saveToCollectionItem
     internal var settingsItem = toolbarMenuItems.settingsItem
     internal var deleteDataOnQuit = toolbarMenuItems.deleteDataOnQuitItem
-    internal var syncedTabsItem = toolbarMenuItems.oldSyncedTabsItem
     internal var syncSignInItem = toolbarMenuItems.syncMenuItem
 
     internal val extensionsItem = WebExtensionPlaceholderMenuItem(
@@ -205,59 +183,7 @@ open class DefaultToolbarMenu(
         handleBookmarkItemTapped()
     }
 
-    internal val oldCoreMenuItems by lazy {
-        val syncedTabs = toolbarMenuItems.oldSyncedTabsItem
-        val addToHomescreen = toolbarMenuItems.oldAddToHomescreenItem
-        val readerAppearance = toolbarMenuItems.oldReaderViewAppearanceItem
-
-        val bookmarksItem = BrowserMenuImageText(
-            context.getString(R.string.library_bookmarks),
-            R.drawable.ic_bookmark_filled,
-            primaryTextColor
-        ) {
-            onItemTapped.invoke(Item.Bookmarks)
-        }
-
-        val shouldShowSetDefaultBrowserItem = getSetDefaultBrowserItem() != null
-
-        // Predicates that are called once, during screen init
-        val shouldShowSaveToCollection = (context.asActivity() as? HomeActivity)
-            ?.browsingModeManager?.mode == BrowsingMode.Normal
-        val shouldDeleteDataOnQuit = context.components.settings
-            .shouldDeleteBrowsingDataOnQuit
-
-        val menuItems = listOfNotNull(
-            downloadsItem,
-            historyItem,
-            bookmarksItem,
-            syncedTabs,
-            settingsItem,
-            if (shouldDeleteDataOnQuit) deleteDataOnQuit else null,
-            BrowserMenuDivider(),
-            reportSiteIssuePlaceholder,
-            findInPageItem,
-            if (shouldShowSetDefaultBrowserItem) BrowserMenuDivider() else null,
-            getSetDefaultBrowserItem(),
-            if (shouldShowSetDefaultBrowserItem) BrowserMenuDivider() else null,
-            addToTopSitesItem,
-            addToHomescreen.apply { visible = ::canAddToHomescreen },
-            installPwaToHomescreen.apply { visible = ::canInstall },
-            if (shouldShowSaveToCollection) saveToCollectionItem else null,
-            desktopSiteItem,
-            openInApp.apply { visible = ::shouldShowOpenInApp },
-            readerAppearance.apply { visible = ::shouldShowReaderViewCustomization },
-            BrowserMenuDivider(),
-            menuToolbarNavigation
-        )
-
-        if (shouldUseBottomToolbar) {
-            menuItems
-        } else {
-            menuItems.reversed()
-        }
-    }
-
-    internal val newCoreMenuItems by lazy {
+    internal val coreMenuItems by lazy {
         // Predicates that are called once, during screen init
         val shouldShowSaveToCollection = (context.asActivity() as? HomeActivity)
             ?.browsingModeManager?.mode == BrowsingMode.Normal
@@ -271,7 +197,7 @@ open class DefaultToolbarMenu(
                 historyItem,
                 downloadsItem,
                 extensionsItem,
-                if (FeatureFlags.tabsTrayRewrite) syncSignInItem else syncedTabsItem,
+                syncSignInItem,
                 BrowserMenuDivider(),
                 getSetDefaultBrowserItem(),
                 getSetDefaultBrowserItem()?.let { BrowserMenuDivider() },
@@ -296,14 +222,8 @@ open class DefaultToolbarMenu(
     }
 
     init {
-        val menuItems = if (FeatureFlags.toolbarMenuFeature) {
-            newCoreMenuItems
-        } else {
-            oldCoreMenuItems
-        }
-
         // Report initial state.
-        onMenuBuilderChanged(BrowserMenuBuilder(menuItems))
+        onMenuBuilderChanged(BrowserMenuBuilder(coreMenuItems))
 
         // Observe account state changes, and update menu item builder with a new set of items.
 //        accountManager.observeAccountState(
