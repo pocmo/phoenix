@@ -91,8 +91,6 @@ class DefaultBrowserToolbarMenuController(
         trackToolbarItemInteraction(item)
 
         Do exhaustive when (item) {
-            // TODO: These can be removed for https://github.com/mozilla-mobile/fenix/issues/17870
-            // todo === Start ===
             is ToolbarMenu.Item.InstallPwaToHomeScreen -> {
                 settings.installPwaOpened = true
                 MainScope().launch {
@@ -130,7 +128,6 @@ class DefaultBrowserToolbarMenuController(
                     activity.finishAndRemoveTask()
                 }
             }
-            // todo === End ===
             is ToolbarMenu.Item.OpenInApp -> {
                 settings.openInAppOpened = true
 
@@ -341,7 +338,6 @@ class DefaultBrowserToolbarMenuController(
                     BrowserFragmentDirections.actionGlobalHistoryFragment()
                 )
             }
-
             is ToolbarMenu.Item.Downloads -> browserAnimator.captureEngineViewAndDrawStatically {
                 navController.nav(
                     R.id.browserFragment,
@@ -375,7 +371,8 @@ class DefaultBrowserToolbarMenuController(
     private fun trackToolbarItemInteraction(item: ToolbarMenu.Item) {
         val eventItem = when (item) {
             is ToolbarMenu.Item.OpenInFenix -> Event.BrowserMenuItemTapped.Item.OPEN_IN_FENIX
-            is ToolbarMenu.Item.InstallPwaToHomeScreen -> Event.BrowserMenuItemTapped.Item.ADD_TO_HOMESCREEN
+            is ToolbarMenu.Item.InstallPwaToHomeScreen ->
+                Event.BrowserMenuItemTapped.Item.ADD_TO_HOMESCREEN
             is ToolbarMenu.Item.Quit -> Event.BrowserMenuItemTapped.Item.QUIT
             is ToolbarMenu.Item.OpenInApp -> Event.BrowserMenuItemTapped.Item.OPEN_IN_APP
             is ToolbarMenu.Item.CustomizeReaderView ->
@@ -393,18 +390,23 @@ class DefaultBrowserToolbarMenuController(
                     Event.BrowserMenuItemTapped.Item.DESKTOP_VIEW_OFF
                 }
             is ToolbarMenu.Item.FindInPage -> Event.BrowserMenuItemTapped.Item.FIND_IN_PAGE
-            is ToolbarMenu.Item.SaveToCollection -> Event.BrowserMenuItemTapped.Item.SAVE_TO_COLLECTION
-            is ToolbarMenu.Item.AddToTopSites -> Event.BrowserMenuItemTapped.Item.ADD_TO_TOP_SITES
-            is ToolbarMenu.Item.AddToHomeScreen -> Event.BrowserMenuItemTapped.Item.ADD_TO_HOMESCREEN
+            is ToolbarMenu.Item.SaveToCollection ->
+                Event.BrowserMenuItemTapped.Item.SAVE_TO_COLLECTION
+            is ToolbarMenu.Item.AddToTopSites ->
+                Event.BrowserMenuItemTapped.Item.ADD_TO_TOP_SITES
+            is ToolbarMenu.Item.AddToHomeScreen ->
+                Event.BrowserMenuItemTapped.Item.ADD_TO_HOMESCREEN
             is ToolbarMenu.Item.SyncedTabs -> Event.BrowserMenuItemTapped.Item.SYNC_TABS
             is ToolbarMenu.Item.SyncAccount -> Event.BrowserMenuItemTapped.Item.SYNC_ACCOUNT
             is ToolbarMenu.Item.Bookmark -> Event.BrowserMenuItemTapped.Item.BOOKMARK
-            is ToolbarMenu.Item.AddonsManager -> Event.BrowserMenuItemTapped.Item.ADDONS_MANAGER
+            is ToolbarMenu.Item.AddonsManager ->
+                Event.BrowserMenuItemTapped.Item.ADDONS_MANAGER
             is ToolbarMenu.Item.Bookmarks -> Event.BrowserMenuItemTapped.Item.BOOKMARKS
             is ToolbarMenu.Item.History -> Event.BrowserMenuItemTapped.Item.HISTORY
             is ToolbarMenu.Item.Downloads -> Event.BrowserMenuItemTapped.Item.DOWNLOADS
             is ToolbarMenu.Item.NewTab -> Event.BrowserMenuItemTapped.Item.NEW_TAB
-            is ToolbarMenu.Item.SetDefaultBrowser -> Event.BrowserMenuItemTapped.Item.SET_DEFAULT_BROWSER
+            is ToolbarMenu.Item.SetDefaultBrowser ->
+                Event.BrowserMenuItemTapped.Item.SET_DEFAULT_BROWSER
         }
 
         metrics.track(Event.BrowserMenuItemTapped(eventItem))

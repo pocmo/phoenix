@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
@@ -33,6 +34,9 @@ import mozilla.components.browser.state.state.createTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.prompt.ShareData
+import mozilla.components.feature.app.links.AppLinksUseCases
+import mozilla.components.feature.pwa.WebAppUseCases
+import mozilla.components.feature.pwa.WebAppUseCases.*
 import mozilla.components.feature.search.SearchUseCases
 import mozilla.components.feature.session.SessionFeature
 import mozilla.components.feature.session.SessionUseCases
@@ -41,7 +45,9 @@ import mozilla.components.feature.tabs.CustomTabsUseCases
 import mozilla.components.feature.top.sites.DefaultTopSitesStorage
 import mozilla.components.feature.top.sites.TopSitesUseCases
 import mozilla.components.support.base.feature.ViewBoundFeatureWrapper
+import mozilla.components.support.test.any
 import mozilla.components.support.test.ext.joinBlocking
+import mozilla.components.support.test.libstate.ext.waitUntilIdle
 import mozilla.components.support.test.rule.MainCoroutineRule
 import org.junit.After
 import org.junit.Before
@@ -61,6 +67,8 @@ import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.components.metrics.MetricController
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.directionsEq
+import org.mozilla.fenix.ext.navigateSafe
+import org.mozilla.fenix.ext.openSetDefaultBrowserOption
 import org.mozilla.fenix.helpers.FenixRobolectricTestRunner
 import org.mozilla.fenix.settings.deletebrowsingdata.deleteAndQuit
 import org.mozilla.fenix.utils.Settings
@@ -83,6 +91,9 @@ class DefaultBrowserToolbarMenuControllerTest {
     @RelaxedMockK private lateinit var searchUseCases: SearchUseCases
     @RelaxedMockK private lateinit var sessionUseCases: SessionUseCases
     @RelaxedMockK private lateinit var customTabUseCases: CustomTabsUseCases
+    @RelaxedMockK private lateinit var webAppUseCases: WebAppUseCases
+    @RelaxedMockK private lateinit var addToHomescreenUseCases: AddToHomescreenUseCase
+    @RelaxedMockK private lateinit var appLinksUseCases: AppLinksUseCases
     @RelaxedMockK private lateinit var browserAnimator: BrowserAnimator
     @RelaxedMockK private lateinit var snackbar: FenixSnackbar
     @RelaxedMockK private lateinit var tabCollectionStorage: TabCollectionStorage
@@ -111,6 +122,9 @@ class DefaultBrowserToolbarMenuControllerTest {
         every { activity.components.useCases.customTabsUseCases } returns customTabUseCases
         every { activity.components.useCases.searchUseCases } returns searchUseCases
         every { activity.components.useCases.topSitesUseCase } returns topSitesUseCase
+        every { activity.components.useCases.webAppUseCases } returns webAppUseCases
+        every { activity.components.useCases.webAppUseCases.addToHomescreen } returns addToHomescreenUseCases
+        every { activity.components.useCases.appLinksUseCases } returns appLinksUseCases
         every { sessionFeatureWrapper.get() } returns sessionFeature
         every { navController.currentDestination } returns mockk {
             every { id } returns R.id.browserFragment
@@ -136,7 +150,7 @@ class DefaultBrowserToolbarMenuControllerTest {
     }
 
     @Test
-    fun handleToolbarBookmarkPressWithReaderModeInactive() = runBlockingTest {
+    fun `IF reader mode is inactive WHEN bookmark menu item is pressed THEN menu item is handled`() = runBlockingTest {
         val item = ToolbarMenu.Item.Bookmark
 
         val title = "Mozilla"
@@ -411,7 +425,10 @@ class DefaultBrowserToolbarMenuControllerTest {
         val controller = createController(scope = this, store = browserStore)
         controller.handleToolbarItemInteraction(item)
 
+        val directions = BrowserFragmentDirections.actionGlobalAddonsManagementFragment()
+
         verify { metrics.track(Event.BrowserMenuItemTapped(Event.BrowserMenuItemTapped.Item.ADDONS_MANAGER)) }
+        verify { navController.navigate(directions, null) }
     }
 
     @Test
@@ -581,6 +598,117 @@ class DefaultBrowserToolbarMenuControllerTest {
         controller.handleToolbarItemInteraction(item)
 
         verify { navController.navigate(directions, null) }
+    }
+
+    @Test
+    fun `WHEN install pwa menu item is pressed AND it is installable THEN add to device homescreen`() = runBlockingTest {
+        val item = ToolbarMenu.Item.InstallPwaToHomeScreen
+        every { activity.components.useCases.webAppUseCases.isInstallable() } returns true
+
+        val controller = createController(scope = this, store = browserStore)
+
+        controller.handleToolbarItemInteraction(item)
+
+        coVerify { addToHomescreenUseCases.invoke(null) }
+    }
+
+    @Test
+    fun `WHEN install pwa menu item is pressed AND it is NOT installable THEN create shortcut`() = runBlockingTest {
+        every { activity.components.useCases.webAppUseCases.isInstallable() } returns false
+
+        val item = ToolbarMenu.Item.InstallPwaToHomeScreen
+        val controller = createController(scope = this, store = browserStore)
+        val directions = BrowserFragmentDirections.actionBrowserFragmentToCreateShortcutFragment()
+
+        controller.handleToolbarItemInteraction(item)
+        verify {
+            navController.navigate(
+                directionsEq(
+                    directions
+                )
+            )
+        }
+    }
+
+    fun `WHEN open in app menu item is pressed THEN redirect`() = runBlockingTest {
+        val item = ToolbarMenu.Item.OpenInApp
+        every { appLinksUseCases.appLinkRedirect } returns mockk(relaxed = true)
+        val controller = createController(scope = this, store = browserStore)
+
+        controller.handleToolbarItemInteraction(item)
+        coVerify { appLinksUseCases.openAppLink.invoke(any()) }
+    }
+
+    fun `WHEN synced tabs are shown in the menu AND the item is pressed THEN redirect`() = runBlockingTest {
+        val item = ToolbarMenu.Item.SyncedTabs
+        val controller = createController(scope = this, store = browserStore)
+        val directions = BrowserFragmentDirections.actionBrowserFragmentToSyncedTabsFragment()
+
+        controller.handleToolbarItemInteraction(item)
+        verify {
+            navController.navigate(
+                directionsEq(
+                    directions
+                )
+            )
+        }
+    }
+
+    fun `GIVEN signed in to sync WHEN sync menu item is pressed THEN redirect to account page`() = runBlockingTest {
+        val item = ToolbarMenu.Item.SyncAccount(true)
+        val controller = createController(scope = this, store = browserStore)
+        val directions = BrowserFragmentDirections.actionGlobalAccountSettingsFragment()
+
+        controller.handleToolbarItemInteraction(item)
+        verify {
+            navController.navigate(
+                directionsEq(
+                    directions
+                )
+            )
+        }
+    }
+
+    fun `GIVEN not signed in to sync WHEN sync menu item is pressed THEN redirect to sync sign in`() = runBlockingTest {
+        val item = ToolbarMenu.Item.SyncAccount(false)
+        val controller = createController(scope = this, store = browserStore)
+        val directions = BrowserFragmentDirections.actionGlobalTurnOnSync()
+
+        controller.handleToolbarItemInteraction(item)
+        verify {
+            navController.navigate(
+                directionsEq(
+                    directions
+                )
+            )
+        }
+    }
+
+    fun `WHEN set to default browser menu item is pressed THEN open option`() = runBlockingTest {
+        val item = ToolbarMenu.Item.SetDefaultBrowser
+
+        val controller = createController(scope = this, store = browserStore)
+
+        controller.handleToolbarItemInteraction(item)
+        verify { metrics.track(Event.SetDefaultBrowserToolbarMenuClicked) }
+        verify { activity.openSetDefaultBrowserOption() }
+    }
+
+    fun `WHEN downloads menu item is pressed THEN redirect`() = runBlockingTest {
+        val item = ToolbarMenu.Item.Downloads
+
+        val controller = createController(scope = this, store = browserStore)
+
+        controller.handleToolbarItemInteraction(item)
+        val directions = BrowserFragmentDirections.actionGlobalDownloadsFragment()
+
+        verify {
+            navController.navigate(
+                directionsEq(
+                    directions
+                )
+            )
+        }
     }
 
     private fun createController(

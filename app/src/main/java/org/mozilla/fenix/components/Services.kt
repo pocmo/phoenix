@@ -13,6 +13,7 @@ import mozilla.components.feature.accounts.FirefoxAccountsAuthFeature
 import mozilla.components.feature.app.links.AppLinksInterceptor
 import mozilla.components.service.fxa.manager.FxaAccountManager
 import org.mozilla.fenix.R
+import org.mozilla.fenix.components.accounts.FxaServer
 import org.mozilla.fenix.ext.getPreferenceKey
 import org.mozilla.fenix.perf.lazyMonitored
 import org.mozilla.fenix.settings.SupportUtils
