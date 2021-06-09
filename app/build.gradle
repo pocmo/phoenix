@@ -153,6 +153,14 @@ android {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         unitTests.includeAndroidResources = true
         animationsDisabled = true
+
+        unitTests.all {
+            // Our version of Robolectric uses http to download dependencies from maven central.
+            // Maven central doesn't allow http access anymore. So we are injecting an https URL for
+            // maven central here.
+            systemProperty 'robolectric.dependency.repo.url', 'https://repo1.maven.org/maven2/'
+            systemProperty 'robolectric.dependency.repo.id', 'central'
+        }
     }
 
     flavorDimensions "engine"
@@ -573,6 +581,7 @@ dependencies {
 if (project.hasProperty("coverage")) {
     tasks.withType(Test).configureEach {
         jacoco.includeNoLocationClasses = true
+        jacoco.excludes = ['jdk.internal.*']
     }
 
     android.applicationVariants.all { variant ->
