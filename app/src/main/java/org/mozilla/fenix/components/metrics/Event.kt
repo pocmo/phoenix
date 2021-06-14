@@ -524,7 +524,7 @@ sealed class Event {
                 }
 
             val countLabel: String
-                get() = "${engineSource.identifier.toLowerCase(Locale.getDefault())}.$label"
+                get() = "${engineSource.identifier.lowercase(Locale.getDefault())}.$label"
 
             val sourceLabel: String
                 get() = "${engineSource.descriptor}.$label"
@@ -605,7 +605,7 @@ sealed class Event {
         }
 
         override val extras: Map<Events.browserMenuActionKeys, String>?
-            get() = mapOf(Events.browserMenuActionKeys.item to item.toString().toLowerCase(Locale.ROOT))
+            get() = mapOf(Events.browserMenuActionKeys.item to item.toString().lowercase(Locale.ROOT))
     }
 
     data class TabCounterMenuItemTapped(val item: Item) : Event() {
@@ -614,7 +614,7 @@ sealed class Event {
         }
 
         override val extras: Map<Events.tabCounterMenuActionKeys, String>?
-            get() = mapOf(Events.tabCounterMenuActionKeys.item to item.toString().toLowerCase(Locale.ROOT))
+            get() = mapOf(Events.tabCounterMenuActionKeys.item to item.toString().lowercase(Locale.ROOT))
     }
 
     object AutoPlaySettingVisited : Event()
@@ -625,7 +625,7 @@ sealed class Event {
         }
 
         override val extras: Map<Autoplay.settingChangedKeys, String>?
-            get() = mapOf(Autoplay.settingChangedKeys.autoplaySetting to setting.toString().toLowerCase(Locale.ROOT))
+            get() = mapOf(Autoplay.settingChangedKeys.autoplaySetting to setting.toString().lowercase(Locale.ROOT))
     }
 
     sealed class Search
