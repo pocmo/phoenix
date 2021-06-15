@@ -281,6 +281,7 @@ class SearchDialogFragment : AppCompatDialogFragment(), UserInteractionHandler {
                     newTab = store.state.tabId == null,
                     from = BrowserDirection.FromSearchDialog
                 )
+            requireContext().components.clipboardHandler.text = null
         }
 
         val stubListener = ViewStub.OnInflateListener { _, inflated ->

@@ -64,6 +64,7 @@ class SearchRobot {
         onView(withContentDescription(expectedText))
     }
     fun verifyDefaultSearchEngine(expectedText: String) = assertDefaultSearchEngine(expectedText)
+    fun verifyFillLinkButton() = assertFillLinkButton()
 
     fun verifyEnginesListShortcutContains(searchEngineName: String) = assertEngineListShortcutContains(searchEngineName)
 
@@ -293,6 +294,12 @@ private fun selectDefaultSearchEngine(searchEngine: String) {
 private fun assertDefaultSearchEngine(expectedText: String) {
     onView(allOf(withId(R.id.mozac_browser_toolbar_edit_icon), withContentDescription(expectedText)))
         .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+}
+
+private fun assertFillLinkButton() {
+    mDevice.waitForIdle()
+    onView(withId(R.id.fill_link_from_clipboard))
+        .check(matches(withEffectiveVisibility(Visibility.GONE)))
 }
 
 private fun goBackButton() = onView(allOf(withContentDescription("Navigate up")))
