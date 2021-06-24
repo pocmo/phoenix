@@ -16,6 +16,7 @@ import org.mozilla.fenix.R
 import org.mozilla.fenix.SecureFragment
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.redirectToReAuth
+import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.showToolbar
 import org.mozilla.fenix.settings.creditcards.controller.DefaultCreditCardEditorController
@@ -59,7 +60,7 @@ class CreditCardEditorFragment : SecureFragment(R.layout.fragment_credit_card_ed
                 storage = storage,
                 lifecycleScope = lifecycleScope,
                 navController = findNavController(),
-                settings = requireContext().settings()
+                metrics = requireComponents.analytics.metrics
             )
         )
 
