@@ -32,6 +32,7 @@ import org.mozilla.fenix.R
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
 import org.mozilla.fenix.components.FenixSnackbar
 import org.mozilla.fenix.ext.directionsEq
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
 import org.mozilla.fenix.ext.optionsEq
 import org.mozilla.fenix.helpers.FenixRobolectricTestRunner
 
@@ -155,7 +156,7 @@ class DefaultRecentlyClosedControllerTest {
         controller.handleNavigateToHistory()
 
         verify {
-            navController.navigate(
+            navController.navigateBlockingForAsyncNavGraph(
                 directionsEq(
                     RecentlyClosedFragmentDirections.actionGlobalHistoryFragment()
                 ),
@@ -190,7 +191,7 @@ class DefaultRecentlyClosedControllerTest {
         controller.handleShare(item)
 
         verify {
-            navController.navigate(
+            navController.navigateBlockingForAsyncNavGraph(
                 directionsEq(
                     RecentlyClosedFragmentDirections.actionGlobalShareFragment(
                         data = arrayOf(ShareData(url = item.url, title = item.title))
@@ -211,7 +212,7 @@ class DefaultRecentlyClosedControllerTest {
                 ShareData(title = tabs[0].title, url = tabs[0].url),
                 ShareData(title = tabs[1].title, url = tabs[1].url)
             )
-            navController.navigate(
+            navController.navigateBlockingForAsyncNavGraph(
                 directionsEq(RecentlyClosedFragmentDirections.actionGlobalShareFragment(data))
             )
         }

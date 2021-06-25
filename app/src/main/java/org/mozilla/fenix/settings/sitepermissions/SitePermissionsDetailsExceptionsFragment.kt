@@ -21,6 +21,7 @@ import mozilla.components.concept.engine.permission.SitePermissions
 import mozilla.components.support.ktx.kotlin.stripDefaultPort
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.components
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.showToolbar
@@ -162,6 +163,6 @@ class SitePermissionsDetailsExceptionsFragment : PreferenceFragmentCompat() {
                 phoneFeature = phoneFeature,
                 sitePermissions = sitePermissions
             )
-        requireView().findNavController().navigate(directions)
+        requireView().findNavController().navigateBlockingForAsyncNavGraph(directions)
     }
 }

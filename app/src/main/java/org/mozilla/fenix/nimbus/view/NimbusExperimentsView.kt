@@ -7,6 +7,7 @@ package org.mozilla.fenix.nimbus.view
 import androidx.navigation.NavController
 import mozilla.components.service.nimbus.ui.NimbusExperimentsAdapterDelegate
 import org.mozilla.experiments.nimbus.AvailableExperiment
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
 import org.mozilla.fenix.nimbus.NimbusExperimentsFragmentDirections
 
 /**
@@ -23,6 +24,6 @@ class NimbusExperimentsView(
                 experimentName = experiment.userFacingName
             )
 
-        navController.navigate(directions)
+        navController.navigateBlockingForAsyncNavGraph(directions)
     }
 }

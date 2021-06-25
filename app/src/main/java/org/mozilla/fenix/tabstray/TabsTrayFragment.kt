@@ -40,6 +40,7 @@ import org.mozilla.fenix.share.ShareFragment
 import org.mozilla.fenix.components.StoreProvider
 import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.ext.components
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.home.HomeScreenViewModel
@@ -388,7 +389,7 @@ class TabsTrayFragment : AppCompatDialogFragment() {
     internal fun navigateToHomeAndDeleteSession(sessionId: String) {
         homeViewModel.sessionToDelete = sessionId
         val directions = NavGraphDirections.actionGlobalHome()
-        findNavController().navigate(directions)
+        findNavController().navigateBlockingForAsyncNavGraph(directions)
     }
 
     @VisibleForTesting
@@ -420,7 +421,7 @@ class TabsTrayFragment : AppCompatDialogFragment() {
             .make(requireView())
             .message(tabSize, isNewCollection)
             .anchorWithAction(anchor) {
-                findNavController().navigate(
+                findNavController().navigateBlockingForAsyncNavGraph(
                     TabsTrayFragmentDirections.actionGlobalHome(
                         focusOnAddressBar = false,
                         focusOnCollection = collectionToSelect.orDefault()

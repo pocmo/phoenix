@@ -29,6 +29,7 @@ import mozilla.components.service.fxa.SyncEngine
 import org.mozilla.fenix.NavGraphDirections
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.StoreProvider
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.settings
 import org.mozilla.fenix.ext.runIfFragmentIsAttached
@@ -129,12 +130,12 @@ class CreditCardsSettingFragment : BiometricPromptPreferenceFragment() {
             loggedInTitle = requireContext()
                 .getString(R.string.preferences_credit_cards_sync_cards),
             onSignInToSyncClicked = {
-                findNavController().navigate(
+                findNavController().navigateBlockingForAsyncNavGraph(
                     NavGraphDirections.actionGlobalTurnOnSync()
                 )
             },
             onReconnectClicked = {
-                findNavController().navigate(
+                findNavController().navigateBlockingForAsyncNavGraph(
                     CreditCardsSettingFragmentDirections.actionGlobalAccountProblemFragment()
                 )
             }
@@ -168,7 +169,7 @@ class CreditCardsSettingFragment : BiometricPromptPreferenceFragment() {
             if (hasCreditCards) {
                 verifyCredentialsOrShowSetupWarning(requireContext(), creditCardPreferences)
             } else {
-                navController.navigate(
+                navController.navigateBlockingForAsyncNavGraph(
                     CreditCardsSettingFragmentDirections
                         .actionCreditCardsSettingFragmentToCreditCardEditorFragment()
                 )
@@ -239,7 +240,7 @@ class CreditCardsSettingFragment : BiometricPromptPreferenceFragment() {
         val directions =
             CreditCardsSettingFragmentDirections
                 .actionCreditCardsSettingFragmentToCreditCardsManagementFragment()
-        findNavController().navigate(directions)
+        findNavController().navigateBlockingForAsyncNavGraph(directions)
     }
 
     companion object {

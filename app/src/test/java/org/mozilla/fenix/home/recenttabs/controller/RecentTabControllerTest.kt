@@ -23,6 +23,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mozilla.fenix.R
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
+import org.mozilla.fenix.helpers.DisableNavGraphProviderAssertionRule
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecentTabControllerTest {
@@ -31,6 +33,9 @@ class RecentTabControllerTest {
 
     @get:Rule
     val coroutinesTestRule = MainCoroutineRule(testDispatcher)
+
+    @get:Rule
+    val disableNavGraphProviderAssertionRule = DisableNavGraphProviderAssertionRule()
 
     private val navController: NavController = mockk(relaxed = true)
     private val selectTabUseCase: TabsUseCases = mockk(relaxed = true)
@@ -66,7 +71,7 @@ class RecentTabControllerTest {
 
         verify {
             selectTabUseCase.selectTab.invoke(tab.id)
-            navController.navigate(R.id.browserFragment)
+            navController.navigateBlockingForAsyncNavGraph(R.id.browserFragment)
         }
     }
 

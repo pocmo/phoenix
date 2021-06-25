@@ -21,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.R
 import org.mozilla.fenix.ext.getPreferenceKey
+import org.mozilla.fenix.ext.navigateBlockingForAsyncNavGraph
 import org.mozilla.fenix.helpers.FenixRobolectricTestRunner
 import org.robolectric.Robolectric
 
@@ -91,6 +92,6 @@ class CreditCardsSettingFragmentTest {
 
         manageCardsPreference?.performClick()
 
-        verify { navController.navigate(directions) }
+        verify { navController.navigateBlockingForAsyncNavGraph(directions) }
     }
 }
