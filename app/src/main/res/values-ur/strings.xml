@@ -54,8 +54,13 @@
     <!-- Home - Recently saved bookmarks -->
     <!-- Title for the home screen section with recently saved bookmarks. -->
     <string name="recently_saved_bookmarks">حال ہی میں محفوظ شدہ</string>
+    <!-- Content description for the recently saved bookmarks section on the home screen. -->
+    <string name="recently_saved_bookmarks_content_description">حالیہ محفوظ  شدہ بک مارک </string>
     <!-- Title for the button which navigates the user to show all of their saved bookmarks. -->
     <string name="recently_saved_show_all">تمام دکھائیں</string>
+
+    <!-- Content description for the button which navigates the user to show all of their saved bookmarks. -->
+    <string name="recently_saved_show_all_content_description">تمام محفوظ شدہ بک مارکس کے بٹن دکھائیں</string>
 
     <!-- About content. The first parameter is the name of the application. (For example: Fenix) -->
     <string name="about_content">%1$s ءMozilla کے ذریعہ تیار کیا گیا ہے۔</string>
@@ -101,6 +106,9 @@
     <!-- Heading for the Top Sites block -->
     <string name="home_screen_top_sites_heading">سر فہرست سائٹین</string>
 
+    <!-- Recent Tabs -->
+    <!-- Header text for jumping back into the recent tab in the home screen -->
+    <string name="recent_tabs_header">واپس جائیں</string>
     <!-- Button text for showing all the tabs in the tabs tray -->
     <string name="recent_tabs_show_all">تمام دکھائیں</string>
 
@@ -458,6 +466,8 @@
     <string name="preferences_marketing_data_description">ہمارے موبائل مارکیٹنگ کے وینڈر، Leanplum کے ساتھ %1$s میں آپکے ذریعہ استعمال کی جانے والی خصوصیات کے کوائف کو بانٹتا ہے۔</string>
     <!-- Title for studies preferences -->
     <string name="preference_experiments_2">مطالعہ</string>
+    <!-- Summary for studies preferences -->
+    <string name="preference_experiments_summary_2">Mozilla کو مطالعے انسٹال اور چلانے کی اجازت دیتا ہے</string>
     <!-- Title for experiments preferences -->
     <string name="preference_experiments">تجربات</string>
 
@@ -608,6 +618,8 @@
     <string name="tabs_header_private_title">نجی سیشن</string>
     <!-- Title for the list of tabs in the current private session -->
     <string name="tabs_header_private_tabs_title">نجی ٹیبس</string>
+    <!-- Title for the list of tabs in the synced tabs -->
+    <string name="tabs_header_synced_tabs_title">سنک شدہ ٹیبز</string>
     <!-- Content description (not visible, for screen readers etc.): Add tab button. Adds a news tab when pressed -->
     <string name="add_tab">ٹيب کا اضافہ کريں</string>
     <!-- Content description (not visible, for screen readers etc.): Add tab button. Adds a news tab when pressed -->
@@ -982,6 +994,8 @@
     <string name="share_link_all_apps_subheader">تمام اعمال</string>
     <!-- Sub-header in the dialog to share a link to an app from the most-recent sorted list -->
     <string name="share_link_recent_apps_subheader">حال ہی میں استعمال کی گئی</string>
+    <!-- An option from the three dot menu to into sync -->
+    <string name="sync_menu_sign_in">سنک کرنے کے لئے سائن ان کریں</string>
     <!-- An option from the share dialog to sign into sync -->
     <string name="sync_sign_in">Sync کے لئے سائن ان کریں</string>
     <!-- An option from the share dialog to send link to all other sync devices -->
@@ -1036,6 +1050,8 @@
     <string name="snackbar_tabs_closed">ٹیبز بند ہوگئیں</string>
     <!-- Text shown in snackbar when user closes tabs -->
     <string name="snackbar_message_tabs_closed">ٹیبز بند ہوگئیں</string>
+    <!-- Text shown in snackbar when user bookmarks a list of tabs -->
+    <string name="snackbar_message_bookmarks_saved">بکمارک محفوظ کر دیا گیا!</string>
     <!-- Text shown in snackbar action for viewing bookmarks -->
     <string name="snackbar_message_bookmarks_view">دیکھیں</string>
     <!-- Text shown in snackbar when user adds a site to top sites -->
@@ -1167,6 +1183,10 @@
     <string name="onboarding_whats_new_header1">دیکھیں نیا کیا ہے</string>
     <!-- text for underlined clickable link that is part of "what's new" onboarding card description that links to an FAQ -->
     <string name="onboarding_whats_new_description_linktext">یہاں جوابات حاصل کریں</string>
+    <!-- text for the Firefox account onboarding sign in card header. The word "Firefox" should not be translated -->
+    <string name="onboarding_account_sign_in_header_1">آلات کے درمیان Firefox کو سنک کریں</string>
+    <!-- Text for the button to learn more about signing in to your Firefox account -->
+    <string name="onboarding_manual_sign_in_description">اس آلہ پر Firefox میں تاریخ اور پاس ورڈ ، کو بُک مارکس کریں ۔</string>
     <!-- text for the button to confirm automatic sign-in -->
     <string name="onboarding_firefox_account_auto_signin_confirm">ہاں ، مجھے سائن ان کریں</string>
     <!-- text for the automatic sign-in button while signing in is in process -->
@@ -1185,6 +1205,8 @@
     <string name="onboarding_tracking_protection_strict_button">سخت (سفارش شدا)</string>
     <!-- text for tracking protection radio button option for strict level of blocking -->
     <string name="onboarding_tracking_protection_strict_option">سخت</string>
+    <!-- text for the toolbar position card header  -->
+    <string name="onboarding_toolbar_placement_header_1">اپنے ٹول بار کی جگہ کا انتخاب کریں</string>
     <!-- text for the private browsing onboarding card header -->
     <string name="onboarding_private_browsing_header">رازداری سے براؤز کریں</string>
 
@@ -1477,6 +1499,15 @@
     <!-- Content description (not visible, for screen readers etc.): Sort saved logins dropdown menu chevron icon -->
     <string name="saved_logins_menu_dropdown_chevron_icon_content_description">لاگ ان مینو کو ترتیب دیں</string>
 
+    <!-- Credit Cards Autofill -->
+    <!-- Preference and title for managing the settings for credit cards -->
+    <string name="preferences_credit_cards">کریڈٹ کارڈز</string>
+    <!-- Preference option for syncing credit cards across devices. This is displayed when the user is signed into sync -->
+    <string name="preferences_credit_cards_sync_cards">کارڈ سنک کریں </string>
+    <!-- Preference option for adding a credit card -->
+    <string name="preferences_credit_cards_add_credit_card">کریڈٹ کارڈ شامل کریں</string>
+    <!-- Preference option for managing saved credit cards -->
+    <string name="preferences_credit_cards_manage_saved_cards">محفوظ شدہ کریڈٹ کارڈز منظم کریں</string>
     <!-- Title of the "Add card" screen -->
     <string name="credit_cards_add_card">کارڈ شامل کریں</string>
     <!-- Title of the "Edit card" screen -->
@@ -1505,6 +1536,12 @@
     <string name="credit_cards_cancel_button">منسوخ کریں</string>
     <!-- Title of the "Saved cards" screen -->
     <string name="credit_cards_saved_cards">محفوظ شدہ کارڈ</string>
+    <!-- Error message for credit card name on card validation -->
+    <string name="credit_cards_name_on_card_validation_error_message">برآیے مہربانی اس قطعہ کو بھریں۔</string>
+    <!-- Message displayed in biometric prompt displayed for authentication before allowing users to view their saved credit cards -->
+    <string name="credit_cards_biometric_prompt_message">اپنے محفوظ شدہ کارڈز کو دیکھنے کے لئے انلاک کریں</string>
+    <!-- Title of warning dialog if users have no device authentication set up -->
+    <string name="credit_cards_warning_dialog_title">اپنے کریڈٹ کارڈز کو محفوظ رکھیں</string>
     <!-- Positive button to send users to set up a pin of warning dialog if users have no device authentication set up -->
     <string name="credit_cards_warning_dialog_set_up_now">ابھی سیٹ اپ کریں</string>
     <!-- Negative button to ignore warning dialog if users have no device authentication set up -->
@@ -1659,6 +1696,8 @@
     <string name="top_sites_toggle_top_frecent_sites">سب سے زیادہ ملاحظہ کی جانے والی سائٹیں دکھائیں</string>
 	<!-- Title text displayed in the rename top site dialog. -->
 	<string name="top_sites_rename_dialog_title">نام</string>
+	<!-- Hint for renaming title of a top site -->
+	<string name="top_site_name_hint">بہترین سائٹس کے نام </string>
 	<!-- Button caption to confirm the renaming of the top site. -->
 	<string name="top_sites_rename_dialog_ok">ٹھیک ہے</string>
 	<!-- Dialog button text for canceling the rename top site prompt. -->
