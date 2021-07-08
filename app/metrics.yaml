@@ -5840,3 +5840,31 @@ start_on_home:
     notification_emails:
       - android-probes@mozilla.com
     expires: "2022-06-16"
+recent_bookmarks:
+  bookmark_clicked:
+    type: event
+    description: |
+      A recently saved bookmark was clicked on the home screen.
+    bugs:
+      - https://github.com/mozilla-mobile/fenix/issues/19931
+    data_reviews:
+      - https://github.com/mozilla-mobile/fenix/pull/TBD...
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: "2022-01-31"
+  show_all_clicked:
+    type: event
+    description: |
+      The show all button was clicked on the recently saved
+      bookmarks section of the home screen.
+    bugs:
+      - https://github.com/mozilla-mobile/fenix/issues/19931
+    data_reviews:
+      - https://github.com/mozilla-mobile/fenix/pull/TBD...
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - android-probes@mozilla.com
+    expires: "2022-01-31"

@@ -46,6 +46,7 @@ import org.mozilla.fenix.GleanMetrics.PrivateBrowsingMode
 import org.mozilla.fenix.GleanMetrics.PrivateBrowsingShortcut
 import org.mozilla.fenix.GleanMetrics.ProgressiveWebApp
 import org.mozilla.fenix.GleanMetrics.ReaderMode
+import org.mozilla.fenix.GleanMetrics.RecentBookmarks
 import org.mozilla.fenix.GleanMetrics.SearchShortcuts
 import org.mozilla.fenix.GleanMetrics.SearchSuggestions
 import org.mozilla.fenix.GleanMetrics.SearchWidget
@@ -848,6 +849,14 @@ private val Event.wrapper: EventWrapper<*>?
 
         is Event.StartOnHomeOpenTabsTray -> EventWrapper<NoExtraKeys>(
             { StartOnHome.openTabsTray.record(it) }
+        )
+
+        is Event.RecentBookmarkClicked -> EventWrapper<NoExtraKeys>(
+            { RecentBookmarks.bookmarkClicked.record(it) }
+        )
+
+        is Event.RecentBookmarkShowAll -> EventWrapper<NoExtraKeys>(
+            { RecentBookmarks.showAllClicked.record(it) }
         )
 
         // Don't record other events in Glean:
