@@ -6,6 +6,7 @@ package org.mozilla.fenix.home.sessioncontrol.viewholders.topsites
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import kotlinx.android.synthetic.main.component_top_sites.view.*
@@ -42,7 +43,8 @@ class TopSitesPagerAdapter(
         }
     }
 
-    private fun update(
+    @VisibleForTesting
+    internal fun update(
         payload: TopSitePagerPayload,
         position: Int,
         adapter: TopSitesAdapter
@@ -71,7 +73,8 @@ class TopSitesPagerAdapter(
     /**
      * @returns the changed only items for the currently specified page in [position]
      */
-    private fun getCurrentPageChanges(payload: TopSitePagerPayload, position: Int) =
+    @VisibleForTesting
+    internal fun getCurrentPageChanges(payload: TopSitePagerPayload, position: Int) =
         payload.changed.filter { changedPair ->
             if (position == 0) changedPair.first < TOP_SITES_PER_PAGE
             else changedPair.first >= TOP_SITES_PER_PAGE
