@@ -39,6 +39,7 @@ import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.ext.navigateSafe
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.settings
+import org.mozilla.fenix.ext.runIfFragmentIsAttached
 import org.mozilla.fenix.shortcut.PwaOnboardingObserver
 import org.mozilla.fenix.trackingprotection.TrackingProtectionOverlay
 
@@ -254,17 +255,18 @@ class BrowserFragment : BaseBrowserFragment(), UserInteractionHandler {
 
     override fun navToTrackingProtectionPanel(tab: SessionState) {
         val navController = findNavController()
-
         requireComponents.useCases.trackingProtectionUseCases.containsException(tab.id) { contains ->
-            val isEnabled = tab.trackingProtection.enabled && !contains
-            val directions =
-                BrowserFragmentDirections.actionBrowserFragmentToTrackingProtectionPanelDialogFragment(
-                    sessionId = tab.id,
-                    url = tab.content.url,
-                    trackingProtectionEnabled = isEnabled,
-                    gravity = getAppropriateLayoutGravity()
-                )
-            navController.navigateSafe(R.id.browserFragment, directions)
+            runIfFragmentIsAttached {
+                val isEnabled = tab.trackingProtection.enabled && !contains
+                val directions =
+                    BrowserFragmentDirections.actionBrowserFragmentToTrackingProtectionPanelDialogFragment(
+                        sessionId = tab.id,
+                        url = tab.content.url,
+                        trackingProtectionEnabled = isEnabled,
+                        gravity = getAppropriateLayoutGravity()
+                    )
+                navController.navigateSafe(R.id.browserFragment, directions)
+            }
         }
     }
 
