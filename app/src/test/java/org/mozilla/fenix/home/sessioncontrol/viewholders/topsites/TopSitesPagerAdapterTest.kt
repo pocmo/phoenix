@@ -98,12 +98,11 @@ class TopSitesPagerAdapterTest {
     }
 
     @Test
-    fun `WHEN update is called to delete the 1st of 4 topSites THEN notifyItemRemoved(0) will be called`() {
+    fun `WHEN update is called to delete the 1st of 4 topSites THEN submitList will update 3 topSites`() {
         val currentList = mutableListOf(topSite, topSite2, topSite3, topSite4)
         val topSitesAdapter: TopSitesAdapter = mockk()
         every { topSitesAdapter.currentList } returns currentList
         every { topSitesAdapter.submitList(any()) } just Runs
-        every { topSitesAdapter.notifyItemRemoved(any()) } just Runs
         val removedTopSite = TopSite(
             id = -1L,
             title = "REMOVED",
@@ -124,16 +123,14 @@ class TopSitesPagerAdapterTest {
 
         val expected = mutableListOf(topSite2, topSite3, topSite4)
         verify { topSitesAdapter.submitList(expected) }
-        verify(exactly = 1) { topSitesAdapter.notifyItemRemoved(0) }
     }
 
     @Test
-    fun `WHEN update is called to delete the 4th of 4 topSites THEN notifyItemRemoved(3) will be called`() {
+    fun `WHEN update is called to delete the 4th of 4 topSites THEN submitList will update 1 topSite`() {
         val currentList = mutableListOf(topSite, topSite2, topSite3, topSite4)
         val topSitesAdapter: TopSitesAdapter = mockk()
         every { topSitesAdapter.currentList } returns currentList
         every { topSitesAdapter.submitList(any()) } just Runs
-        every { topSitesAdapter.notifyItemRemoved(any()) } just Runs
         val removedTopSite = TopSite(
             id = -1L,
             title = "REMOVED",
@@ -151,7 +148,6 @@ class TopSitesPagerAdapterTest {
 
         val expected = mutableListOf(topSite, topSite2, topSite3)
         verify { topSitesAdapter.submitList(expected) }
-        verify(exactly = 1) { topSitesAdapter.notifyItemRemoved(3) }
     }
 
     @Test
@@ -160,7 +156,6 @@ class TopSitesPagerAdapterTest {
         val topSitesAdapter: TopSitesAdapter = mockk()
         every { topSitesAdapter.currentList } returns currentList
         every { topSitesAdapter.submitList(any()) } just Runs
-        every { topSitesAdapter.notifyItemRemoved(any()) } just Runs
         val changedTopSite = TopSite(
             id = 3L,
             title = "CHANGED",
@@ -178,6 +173,5 @@ class TopSitesPagerAdapterTest {
 
         val expected = mutableListOf(topSite, topSite2, changedTopSite, topSite4)
         verify { topSitesAdapter.submitList(expected) }
-        verify(exactly = 0) { topSitesAdapter.notifyItemRemoved(any()) }
     }
 }

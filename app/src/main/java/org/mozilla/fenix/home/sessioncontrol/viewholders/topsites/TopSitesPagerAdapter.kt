@@ -67,7 +67,6 @@ class TopSitesPagerAdapter(
         // Delete any items marked as such and submit the list, then notify adapter of deletions
         itemsToRemove.forEach { refreshedItems.removeAt(it) }
         adapter.submitList(refreshedItems)
-        itemsToRemove.forEach { adapter.notifyItemRemoved(it) }
     }
 
     /**
