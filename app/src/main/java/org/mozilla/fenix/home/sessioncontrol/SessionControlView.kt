@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import mozilla.components.browser.state.state.TabSessionState
+import mozilla.components.concept.storage.HistoryMetadata
 import mozilla.components.feature.tab.collections.TabCollection
 import mozilla.components.feature.top.sites.TopSite
 import org.mozilla.fenix.components.tips.Tip
@@ -30,7 +31,8 @@ private fun normalModeAdapterItems(
     tip: Tip?,
     showCollectionsPlaceholder: Boolean,
     showSetAsDefaultBrowserCard: Boolean,
-    recentTabs: List<TabSessionState>
+    recentTabs: List<TabSessionState>,
+    historyMetadata: List<HistoryMetadata>
 ): List<AdapterItem> {
     val items = mutableListOf<AdapterItem>()
 
@@ -46,6 +48,10 @@ private fun normalModeAdapterItems(
 
     if (recentTabs.isNotEmpty()) {
         showRecentTabs(recentTabs, items)
+    }
+
+    if (historyMetadata.isNotEmpty()) {
+        showHistoryMetadata(historyMetadata, items)
     }
 
     if (collections.isEmpty()) {
@@ -66,6 +72,16 @@ private fun showRecentTabs(
     items.add(AdapterItem.RecentTabsHeader)
     recentTabs.forEach {
         items.add(AdapterItem.RecentTabItem(it))
+    }
+}
+
+private fun showHistoryMetadata(
+    historyMetadata: List<HistoryMetadata>,
+    items: MutableList<AdapterItem>
+) {
+    items.add(AdapterItem.HistoryMetadataHeader)
+    historyMetadata.map {
+        items.add(AdapterItem.HistoryMetadataItem(it))
     }
 }
 
@@ -133,7 +149,8 @@ private fun HomeFragmentState.toAdapterList(): List<AdapterItem> = when (mode) {
         tip,
         showCollectionPlaceholder,
         showSetAsDefaultBrowserCard,
-        recentTabs
+        recentTabs,
+        historyMetadata
     )
     is Mode.Private -> privateModeAdapterItems()
     is Mode.Onboarding -> onboardingAdapterItems(mode.state)

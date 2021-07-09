@@ -8,6 +8,8 @@ import mozilla.components.feature.tab.collections.Tab
 import mozilla.components.feature.tab.collections.TabCollection
 import mozilla.components.feature.top.sites.TopSite
 import org.mozilla.fenix.components.tips.Tip
+import org.mozilla.fenix.historymetadata.controller.HistoryMetadataController
+import org.mozilla.fenix.historymetadata.interactor.HistoryMetadataInteractor
 import org.mozilla.fenix.home.recenttabs.controller.RecentTabController
 import org.mozilla.fenix.home.recenttabs.interactor.RecentTabInteractor
 
@@ -213,9 +215,11 @@ interface ExperimentCardInteractor {
 @SuppressWarnings("TooManyFunctions")
 class SessionControlInteractor(
     private val controller: SessionControlController,
-    private val recentTabController: RecentTabController
+    private val recentTabController: RecentTabController,
+    private val historyMetadataController: HistoryMetadataController
 ) : CollectionInteractor, OnboardingInteractor, TopSiteInteractor, TipInteractor,
-    TabSessionInteractor, ToolbarInteractor, ExperimentCardInteractor, RecentTabInteractor {
+    TabSessionInteractor, ToolbarInteractor, ExperimentCardInteractor, RecentTabInteractor,
+    HistoryMetadataInteractor {
     override fun onCollectionAddTabTapped(collection: TabCollection) {
         controller.handleCollectionAddTabTapped(collection)
     }
@@ -326,5 +330,13 @@ class SessionControlInteractor(
 
     override fun onRecentTabShowAllClicked() {
         recentTabController.handleRecentTabShowAllClicked()
+    }
+
+    override fun onHistoryMetadataItemClicked(url: String) {
+        historyMetadataController.handleHistoryMetadataItemClicked(url)
+    }
+
+    override fun onHistoryMetadataShowAllClicked() {
+        historyMetadataController.handleHistoryShowAllClicked()
     }
 }

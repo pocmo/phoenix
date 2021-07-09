@@ -112,6 +112,8 @@ import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.runIfFragmentIsAttached
 import org.mozilla.fenix.ext.settings
+import org.mozilla.fenix.historymetadata.HistoryMetadataFeature
+import org.mozilla.fenix.historymetadata.controller.DefaultHistoryMetadataController
 import org.mozilla.fenix.home.mozonline.showPrivacyPopWindow
 import org.mozilla.fenix.home.recenttabs.controller.DefaultRecentTabsController
 import org.mozilla.fenix.home.sessioncontrol.DefaultSessionControlController
@@ -176,6 +178,7 @@ class HomeFragment : Fragment() {
 
     private val topSitesFeature = ViewBoundFeatureWrapper<TopSitesFeature>()
     private val recentTabsListFeature = ViewBoundFeatureWrapper<RecentTabsListFeature>()
+    private val historyMetadataFeature = ViewBoundFeatureWrapper<HistoryMetadataFeature>()
 
     @VisibleForTesting
     internal var getMenuButton: () -> MenuButton? = { menuButton }
@@ -234,7 +237,8 @@ class HomeFragment : Fragment() {
                     },
                     showCollectionPlaceholder = components.settings.showCollectionsPlaceholderOnHome,
                     showSetAsDefaultBrowserCard = components.settings.shouldShowSetAsDefaultBrowserCard(),
-                    recentTabs = components.core.store.state.asRecentTabs()
+                    recentTabs = components.core.store.state.asRecentTabs(),
+                    historyMetadata = emptyList()
                 )
             )
         }
@@ -254,6 +258,18 @@ class HomeFragment : Fragment() {
                 feature = RecentTabsListFeature(
                     browserStore = components.core.store,
                     homeStore = homeFragmentStore
+                ),
+                owner = viewLifecycleOwner,
+                view = view
+            )
+        }
+
+        if (FeatureFlags.historyMetadataFeature) {
+            historyMetadataFeature.set(
+                feature = HistoryMetadataFeature(
+                    homeStore = homeFragmentStore,
+                    historyMetadataStorage = components.core.historyStorage,
+                    scope = viewLifecycleOwner.lifecycleScope
                 ),
                 owner = viewLifecycleOwner,
                 view = view
@@ -283,6 +299,12 @@ class HomeFragment : Fragment() {
             ),
             recentTabController = DefaultRecentTabsController(
                 selectTabUseCase = components.useCases.tabsUseCases.selectTab,
+                navController = findNavController()
+            ),
+            historyMetadataController = DefaultHistoryMetadataController(
+                activity = activity,
+                settings = components.settings,
+                addTabUseCase = components.useCases.tabsUseCases.addTab,
                 navController = findNavController()
             )
         )
@@ -600,7 +622,8 @@ class HomeFragment : Fragment() {
                     ).getTip()
                 },
                 showCollectionPlaceholder = components.settings.showCollectionsPlaceholderOnHome,
-                recentTabs = components.core.store.state.asRecentTabs()
+                recentTabs = components.core.store.state.asRecentTabs(),
+                historyMetadata = emptyList()
             )
         )
 
