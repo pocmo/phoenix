@@ -5,6 +5,8 @@
 package org.mozilla.fenix.tabstray.viewholders
 
 import android.view.View
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.concept.tabstray.Tab
 import org.mozilla.fenix.R
@@ -12,7 +14,8 @@ import org.mozilla.fenix.selection.SelectionHolder
 import org.mozilla.fenix.tabstray.TabsTrayInteractor
 import org.mozilla.fenix.tabstray.TabsTrayStore
 import org.mozilla.fenix.tabstray.browser.BrowserTrayList.BrowserTabType.NORMAL
-import org.mozilla.fenix.tabstray.browser.BrowserTabsAdapter
+import org.mozilla.fenix.tabstray.browser.browserAdapter
+import org.mozilla.fenix.tabstray.ext.numberOfGridColumns
 
 /**
  * View holder for the normal tabs tray list.
@@ -49,7 +52,20 @@ class NormalBrowserPageViewHolder(
         adapter: RecyclerView.Adapter<out RecyclerView.ViewHolder>,
         layoutManager: RecyclerView.LayoutManager
     ) {
-        (adapter as BrowserTabsAdapter).selectionHolder = this
+        val browserAdapter = (adapter as ConcatAdapter).browserAdapter
+        browserAdapter.selectionHolder = this
+
+        /* A WIP SpanSizeLookup that is aware of our view type and other adapters.
+        (layoutManager as GridLayoutManager).spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return if (position >= browserAdapter.itemCount || settings.gridView.not()) {
+                    1
+                } else {
+                    context.numberOfGridColumns
+                }
+            }
+        }
+        */
 
         super.bind(adapter, layoutManager)
     }
