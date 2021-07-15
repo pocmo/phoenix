@@ -71,7 +71,9 @@ class BrowserTabsAdapter(
 
         holder.tab?.let { tab ->
             holder.itemView.mozac_browser_tabstray_close.setOnClickListener {
-                interactor.close(tab)
+                if(!holder.itemView.mozac_browser_tabstray_close.isGone) {
+                    interactor.close(tab)
+                }
             }
 
             selectionHolder?.let {

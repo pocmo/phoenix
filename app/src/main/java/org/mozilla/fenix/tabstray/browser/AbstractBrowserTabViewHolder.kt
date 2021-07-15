@@ -102,9 +102,10 @@ abstract class AbstractBrowserTabViewHolder(
         }
     }
 
+    // Function for selecting multiple Tabs at Once.
     fun showTabIsMultiSelectEnabled(isSelected: Boolean) {
         itemView.selected_mask.isVisible = isSelected
-        closeView.isInvisible = trayStore.state.mode is TabsTrayState.Mode.Select
+        closeView.isGone = trayStore.state.mode is TabsTrayState.Mode.Select
     }
 
     private fun updateFavicon(tab: Tab) {
