@@ -18,6 +18,7 @@ import mozilla.components.feature.top.sites.TopSite.Type.DEFAULT
 import mozilla.components.feature.top.sites.TopSite.Type.FRECENT
 import mozilla.components.feature.top.sites.TopSite.Type.PINNED
 import org.mozilla.fenix.R
+import org.mozilla.fenix.components.FenixSnackbar
 import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.loadIntoView
@@ -48,9 +49,24 @@ class TopSiteItemViewHolder(
                     is TopSiteItemMenu.Item.RenameTopSite -> interactor.onRenameTopSiteClicked(
                         topSite
                     )
-                    is TopSiteItemMenu.Item.RemoveTopSite -> interactor.onRemoveTopSiteClicked(
-                        topSite
-                    )
+                    is TopSiteItemMenu.Item.RemoveTopSite -> {
+                        interactor.onRemoveTopSiteClicked(
+                                topSite
+                        )
+                        FenixSnackbar.make(
+                                view = it,
+                                duration = FenixSnackbar.LENGTH_LONG,
+                                isDisplayedWithBrowserToolbar = false
+                        )
+                                .setText(it.context.getString(R.string.snackbar_top_site_removed))
+                                .setAction(it.context.getString(R.string.snackbar_deleted_undo)) {
+                                    it.context.components.useCases.topSitesUseCase.addPinnedSites(
+                                            topSite.title.toString(),
+                                            topSite.url
+                                    )
+                                }
+                                .show()
+                    }
                 }
             }
             val menu = topSiteMenu.menuBuilder.build(view.context).show(anchor = it)
