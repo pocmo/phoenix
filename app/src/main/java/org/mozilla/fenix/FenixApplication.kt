@@ -5,6 +5,7 @@
 package org.mozilla.fenix
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
@@ -13,6 +14,8 @@ import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.getSystemService
+import androidx.datastore.preferences.SharedPreferencesMigration
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration.Builder
 import androidx.work.Configuration.Provider
@@ -74,6 +77,15 @@ import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.components.metrics.MozillaProductDetector
 import org.mozilla.fenix.components.toolbar.ToolbarPosition
 import org.mozilla.fenix.utils.Settings
+
+private const val FENIX_PREFERENCES = "fenix_preferences"
+
+val Context.dataStore by preferencesDataStore(
+    name = FENIX_PREFERENCES,
+    produceMigrations = { context ->
+        listOf(SharedPreferencesMigration(context, FENIX_PREFERENCES))
+    }
+)
 
 /**
  *The main application class for Fenix. Records data to measure initialization performance.

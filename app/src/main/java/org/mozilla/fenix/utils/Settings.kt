@@ -618,36 +618,6 @@ class Settings(private val appContext: Context) : PreferencesHolder {
         default = false
     )
 
-    var deleteOpenTabs by booleanPreference(
-        appContext.getPreferenceKey(R.string.pref_key_delete_open_tabs_now),
-        default = true
-    )
-
-    var deleteBrowsingHistory by booleanPreference(
-        appContext.getPreferenceKey(R.string.pref_key_delete_browsing_history_now),
-        default = true
-    )
-
-    var deleteCookies by booleanPreference(
-        appContext.getPreferenceKey(R.string.pref_key_delete_cookies_now),
-        default = true
-    )
-
-    var deleteCache by booleanPreference(
-        appContext.getPreferenceKey(R.string.pref_key_delete_caches_now),
-        default = true
-    )
-
-    var deleteSitePermissions by booleanPreference(
-        appContext.getPreferenceKey(R.string.pref_key_delete_permissions_now),
-        default = true
-    )
-
-    var deleteDownloads by booleanPreference(
-        appContext.getPreferenceKey(R.string.pref_key_delete_downloads_now),
-        default = true
-    )
-
     var shouldUseBottomToolbar by booleanPreference(
         appContext.getPreferenceKey(R.string.pref_key_toolbar_bottom),
         // Default accessibility users to top toolbar

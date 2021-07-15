@@ -29,21 +29,25 @@ import org.mozilla.fenix.R
 import org.mozilla.fenix.components.FenixSnackbar
 import org.mozilla.fenix.components.metrics.Event
 import org.mozilla.fenix.ext.requireComponents
-import org.mozilla.fenix.ext.settings
+import org.mozilla.fenix.ext.runIfFragmentIsAttached
 import org.mozilla.fenix.ext.showToolbar
-import org.mozilla.fenix.utils.Settings
 
 @SuppressWarnings("TooManyFunctions", "LargeClass")
 class DeleteBrowsingDataFragment : Fragment(R.layout.fragment_delete_browsing_data) {
 
     private lateinit var controller: DeleteBrowsingDataController
+    private lateinit var preferencesRepository: DeleteBrowsingDataPreferencesRepository
+
     private var scope: CoroutineScope? = null
-    private lateinit var settings: Settings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val tabsUseCases = requireComponents.useCases.tabsUseCases
         val downloadUseCases = requireComponents.useCases.downloadUseCases
+        preferencesRepository =
+            DeleteBrowsingDataPreferencesRepository(context = requireContext())
+
         controller = DefaultDeleteBrowsingDataController(
             tabsUseCases.removeAllTabs,
             downloadUseCases.removeAllDownloads,
@@ -53,7 +57,6 @@ class DeleteBrowsingDataFragment : Fragment(R.layout.fragment_delete_browsing_da
             requireComponents.core.icons,
             requireComponents.core.engine
         )
-        settings = requireContext().settings()
 
         getCheckboxes().forEach {
             it.onCheckListener = { _ ->
@@ -62,33 +65,47 @@ class DeleteBrowsingDataFragment : Fragment(R.layout.fragment_delete_browsing_da
             }
         }
 
-        getCheckboxes().forEach {
-            it.isChecked = when (it.id) {
-                R.id.open_tabs_item -> settings.deleteOpenTabs
-                R.id.browsing_data_item -> settings.deleteBrowsingHistory
-                R.id.cookies_item -> settings.deleteCookies
-                R.id.cached_files_item -> settings.deleteCache
-                R.id.site_permissions_item -> settings.deleteSitePermissions
-                R.id.downloads_item -> settings.deleteDownloads
-                else -> true
-            }
-        }
+        updateCheckboxes()
 
         view.delete_data?.setOnClickListener {
             askToDelete()
         }
+
         updateDeleteButton()
     }
 
     private fun updatePreference(it: DeleteBrowsingDataItem) {
-        when (it.id) {
-            R.id.open_tabs_item -> settings.deleteOpenTabs = it.isChecked
-            R.id.browsing_data_item -> settings.deleteBrowsingHistory = it.isChecked
-            R.id.cookies_item -> settings.deleteCookies = it.isChecked
-            R.id.cached_files_item -> settings.deleteCache = it.isChecked
-            R.id.site_permissions_item -> settings.deleteSitePermissions = it.isChecked
-            R.id.downloads_item -> settings.deleteDownloads = it.isChecked
-            else -> return
+        lifecycleScope.launch(IO) {
+            when (it.id) {
+                R.id.open_tabs_item -> preferencesRepository.enableDeleteOpenTabs(it.isChecked)
+                R.id.browsing_data_item -> preferencesRepository.enableDeleteBrowsingHistory(it.isChecked)
+                R.id.cookies_item -> preferencesRepository.enableDeleteCookies(it.isChecked)
+                R.id.cached_files_item -> preferencesRepository.enableDeleteCache(it.isChecked)
+                R.id.site_permissions_item -> preferencesRepository.enableDeleteSitePermissions(it.isChecked)
+                R.id.downloads_item -> preferencesRepository.enableDeleteDownloads(it.isChecked)
+            }
+        }
+    }
+
+    private fun updateCheckboxes() {
+        lifecycleScope.launch(IO) {
+            preferencesRepository.deleteBrowsingDataPreferencesFlow.collect { preferences ->
+                lifecycleScope.launch(Main) {
+                    runIfFragmentIsAttached {
+                        getCheckboxes().forEach {
+                            it.isChecked = when (it.id) {
+                                R.id.open_tabs_item -> preferences.deleteOpenTabs
+                                R.id.browsing_data_item -> preferences.deleteBrowsingHistory
+                                R.id.cookies_item -> preferences.deleteCookies
+                                R.id.cached_files_item -> preferences.deleteCache
+                                R.id.site_permissions_item -> preferences.deleteSitePermissions
+                                R.id.downloads_item -> preferences.deleteDownloads
+                                else -> true
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
