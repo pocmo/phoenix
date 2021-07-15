@@ -409,8 +409,12 @@ class DefaultSessionControlController(
             }
         event?.let { activity.metrics.track(it) }
 
+        var specialUrl = url
+        if (SupportUtils.isShoppingFes && url == SupportUtils.JD_URL) {
+            specialUrl = SupportUtils.JD_618_URL
+        }
         val tabId = addTabUseCase.invoke(
-            url = appendSearchAttributionToUrlIfNeeded(url),
+            url = appendSearchAttributionToUrlIfNeeded(specialUrl),
             selectTab = true,
             startLoading = true
         )
