@@ -48,6 +48,25 @@ object MockWebServerHelper {
             this.dispatcher = dispatcher
         }
     }
+
+    /**
+     * Create a mock webserver that accepts all requests and replies with an error message.
+     * @return a [MockWebServer] instance
+     */
+    fun createErrorResponseMockWebServer(code: Int, body: String = "", header: Pair<String, String> = Pair("", "")): MockWebServer {
+        return MockWebServer().apply {
+            val dispatcher = object : Dispatcher() {
+                @Throws(InterruptedException::class)
+                override fun dispatch(request: RecordedRequest): MockResponse {
+                    return MockResponse()
+                        .setResponseCode(code)
+                        .setHeader(header.first, header.second)
+                        .setBody(body)
+                }
+            }
+            this.dispatcher = dispatcher
+        }
+    }
 }
 
 /**
