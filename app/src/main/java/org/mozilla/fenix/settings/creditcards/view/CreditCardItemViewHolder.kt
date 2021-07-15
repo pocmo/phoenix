@@ -5,12 +5,12 @@
 package org.mozilla.fenix.settings.creditcards.view
 
 import android.view.View
-import kotlinx.android.synthetic.main.credit_card_list_item.*
+import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.concept.storage.CreditCard
 import mozilla.components.support.utils.creditCardIssuerNetwork
 import org.mozilla.fenix.R
+import org.mozilla.fenix.databinding.CreditCardListItemBinding
 import org.mozilla.fenix.settings.creditcards.interactor.CreditCardsManagementInteractor
-import org.mozilla.fenix.utils.view.ViewHolder
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -21,12 +21,14 @@ import java.util.Locale
 class CreditCardItemViewHolder(
     view: View,
     private val interactor: CreditCardsManagementInteractor
-) : ViewHolder(view) {
+) : RecyclerView.ViewHolder(view) {
+
+    private val binding = CreditCardListItemBinding.bind(view)
 
     fun bind(creditCard: CreditCard) {
-        credit_card_logo.setImageResource(creditCard.cardType.creditCardIssuerNetwork().icon)
+        binding.creditCardLogo.setImageResource(creditCard.cardType.creditCardIssuerNetwork().icon)
 
-        credit_card_number.text = creditCard.obfuscatedCardNumber
+        binding.creditCardNumber.text = creditCard.obfuscatedCardNumber
 
         bindCreditCardExpiryDate(creditCard)
 
@@ -47,7 +49,7 @@ class CreditCardItemViewHolder(
         calendar.set(Calendar.MONTH, creditCard.expiryMonth.toInt() - 1)
         calendar.set(Calendar.YEAR, creditCard.expiryYear.toInt())
 
-        expiry_date.text = dateFormat.format(calendar.time)
+        binding.expiryDate.text = dateFormat.format(calendar.time)
     }
 
     companion object {
