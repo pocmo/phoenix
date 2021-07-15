@@ -68,6 +68,7 @@ import mozilla.components.browser.state.selector.findTab
 import mozilla.components.browser.state.selector.normalTabs
 import mozilla.components.browser.state.selector.privateTabs
 import mozilla.components.browser.state.state.BrowserState
+import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.storage.FrecencyThresholdOption
@@ -155,6 +156,10 @@ class HomeFragment : Fragment() {
                 view?.sessionControlRecyclerView?.adapter?.notifyDataSetChanged()
             }
             showRenamedSnackbar()
+        }
+
+        override fun onTabsAdded(tabCollection: TabCollection, sessions: List<TabSessionState>) {
+            showTabSavedToCollectionSnackbar(sessions.size, collectionToSelect = tabCollection.id)
         }
     }
 
@@ -1075,6 +1080,41 @@ class HomeFragment : Fragment() {
             )
                 .setText(string)
                 .setAnchorView(snackbarAnchorView)
+                .show()
+        }
+    }
+
+    private fun showTabSavedToCollectionSnackbar(
+        tabSize: Int,
+        isNewCollection: Boolean = false,
+        collectionToSelect: Long?
+    ) {
+        view?.let { view ->
+            val messageStringRes = when {
+                isNewCollection -> {
+                    R.string.create_collection_tabs_saved_new_collection
+                }
+                tabSize > 1 -> {
+                    R.string.create_collection_tabs_saved
+                }
+                else -> {
+                    R.string.create_collection_tab_saved
+                }
+            }
+            FenixSnackbar.make(
+                view = view,
+                duration = Snackbar.LENGTH_LONG,
+                isDisplayedWithBrowserToolbar = false
+            )
+                .setText(view.context.getString(messageStringRes))
+                .setAnchorView(snackbarAnchorView)
+                .setAction(requireContext().getString(R.string.create_collection_view)) {
+                    findNavController().navigateBlockingForAsyncNavGraph(
+                        HomeFragmentDirections.actionGlobalHome(
+                            focusOnAddressBar = false,
+                            focusOnCollection = collectionToSelect ?: -1L)
+                    )
+                }
                 .show()
         }
     }
