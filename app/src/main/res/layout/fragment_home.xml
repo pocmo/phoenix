@@ -149,6 +149,7 @@
             android:id="@+id/tab_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackground"
             app:layout_constraintTop_toTopOf="@id/bottom_bar"
             app:layout_constraintBottom_toBottomOf="@id/bottom_bar"
             app:layout_constraintEnd_toStartOf="@+id/menuButton"
@@ -158,6 +159,7 @@
             android:id="@+id/menuButton"
             android:layout_width="36dp"
             android:layout_height="48dp"
+            android:background="?android:attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/bottom_bar"
             app:layout_constraintBottom_toBottomOf="@id/bottom_bar"/>
