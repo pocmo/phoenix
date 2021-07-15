@@ -175,6 +175,7 @@
     <ToggleButton
         android:id="@+id/qr_scan_button"
         style="@style/search_pill"
+        android:layout_height="@dimen/search_fragment_toggleButton_height"
         android:layout_marginEnd="@dimen/search_fragment_scan_button_margin_end"
         android:textOff="@string/search_scan_button"
         android:textOn="@string/search_scan_button"
@@ -187,6 +188,7 @@
     <ToggleButton
         android:id="@+id/search_engines_shortcut_button"
         style="@style/search_pill"
+        android:layout_height="@dimen/search_fragment_toggleButton_height"
         android:textOff="@string/search_engine_button"
         android:textOn="@string/search_engine_button"
         app:drawableStartCompat="@drawable/ic_search"
