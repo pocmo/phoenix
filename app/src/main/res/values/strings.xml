@@ -695,7 +695,7 @@
     <!-- Hint for adding name of a collection -->
     <string name="collection_name_hint">Collection name</string>
 	<!-- Text for the menu button to rename a top site -->
-	<string name="rename_top_site">Rename</string>
+	<string name="edit_top_site">Edit</string>
 	<!-- Text for the menu button to remove a top site -->
 	<string name="remove_top_site">Remove</string>
     <!-- Text for the menu button to delete a top site from history -->
@@ -1751,13 +1751,17 @@
     <string name="top_sites_max_limit_confirmation_button">OK, Got It</string>
     <!-- Label for the show most visited sites preference -->
     <string name="top_sites_toggle_top_frecent_sites">Show most visited sites</string>
-	<!-- Title text displayed in the rename top site dialog. -->
+	<!-- Label for the title in the edit top site dialog. -->
 	<string name="top_sites_rename_dialog_title">Name</string>
 	<!-- Hint for renaming title of a top site -->
 	<string name="top_site_name_hint">Top site name</string>
-	<!-- Button caption to confirm the renaming of the top site. -->
+	<!-- Label for the URL in the edit top site dialog. -->
+	<string name="top_sites_rename_dialog_url">URL</string>
+	<!-- Error message when the user entered an invalid top site URL -->
+	<string name="top_site_url_invalid">Invalid URL</string>
+	<!-- Button caption to confirm the editing of the top site. -->
 	<string name="top_sites_rename_dialog_ok">OK</string>
-	<!-- Dialog button text for canceling the rename top site prompt. -->
+	<!-- Dialog button text for canceling the edit top site prompt. -->
 	<string name="top_sites_rename_dialog_cancel">Cancel</string>
 
     <!-- Default browser experiment -->

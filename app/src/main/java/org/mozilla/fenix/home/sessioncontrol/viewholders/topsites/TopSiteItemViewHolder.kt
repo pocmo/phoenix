@@ -23,6 +23,7 @@ import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.loadIntoView
 import org.mozilla.fenix.home.sessioncontrol.TopSiteInteractor
 import org.mozilla.fenix.settings.SupportUtils
+import org.mozilla.fenix.theme.ThemeManager
 import org.mozilla.fenix.utils.view.ViewHolder
 
 class TopSiteItemViewHolder(
@@ -45,7 +46,7 @@ class TopSiteItemViewHolder(
                     is TopSiteItemMenu.Item.OpenInPrivateTab -> interactor.onOpenInPrivateTabClicked(
                         topSite
                     )
-                    is TopSiteItemMenu.Item.RenameTopSite -> interactor.onRenameTopSiteClicked(
+                    is TopSiteItemMenu.Item.EditTopSite -> interactor.onEditTopSiteClicked(
                         topSite
                     )
                     is TopSiteItemMenu.Item.RemoveTopSite -> interactor.onRemoveTopSiteClicked(
@@ -115,7 +116,7 @@ class TopSiteItemMenu(
 ) {
     sealed class Item {
         object OpenInPrivateTab : Item()
-        object RenameTopSite : Item()
+        object EditTopSite : Item()
         object RemoveTopSite : Item()
     }
 
@@ -129,16 +130,17 @@ class TopSiteItemMenu(
                 onItemTapped.invoke(Item.OpenInPrivateTab)
             },
             if (isPinnedSite) SimpleBrowserMenuItem(
-                context.getString(R.string.rename_top_site)
+                context.getString(R.string.edit_top_site)
             ) {
-                onItemTapped.invoke(Item.RenameTopSite)
+                onItemTapped.invoke(Item.EditTopSite)
             } else null,
             SimpleBrowserMenuItem(
                 if (isPinnedSite) {
                     context.getString(R.string.remove_top_site)
                 } else {
                     context.getString(R.string.delete_from_history)
-                }
+                },
+                textColorResource = ThemeManager.resolveAttribute(R.attr.destructive, context)
             ) {
                 onItemTapped.invoke(Item.RemoveTopSite)
             }

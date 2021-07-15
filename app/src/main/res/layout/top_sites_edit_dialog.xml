@@ -3,6 +3,7 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -31,4 +32,33 @@
         android:inputType="textCapSentences"
         android:singleLine="true"
         android:textAlignment="viewStart" />
+
+    <TextView
+        android:id="@+id/url_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/top_sites_rename_dialog_url"
+        android:textAllCaps="true"
+        android:textAppearance="@style/Body16TextStyle"
+        android:textColor="?secondaryText" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/top_site_url_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/top_site_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="false"
+            android:backgroundTint="?neutral"
+            android:inputType="textUri" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

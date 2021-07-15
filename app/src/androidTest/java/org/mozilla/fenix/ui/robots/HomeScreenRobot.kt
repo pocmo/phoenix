@@ -115,6 +115,8 @@ class HomeScreenRobot {
     fun verifyNotExistingTopSitesList(title: String) = assertNotExistingTopSitesList(title)
     fun verifyExistingTopSitesTabs(title: String) = assertExistingTopSitesTabs(title)
     fun verifyTopSiteContextMenuItems() = assertTopSiteContextMenuItems()
+    fun verifyEditTopSiteValues(title: String, url: String) = assertEditTopSiteValues(title, url)
+    fun verifyEditTopSiteUrlInvalid() = assertEditTopSiteUrlInvalid()
 
     // Collections elements
     fun verifyCollectionIsDisplayed(title: String, collectionExists: Boolean = true) {
@@ -262,12 +264,27 @@ class HomeScreenRobot {
             return BrowserRobot.Transition()
         }
 
-        fun renameTopSite(title: String, interact: HomeScreenRobot.() -> Unit): Transition {
-            onView(withText("Rename"))
+        fun clickEdit(interact: HomeScreenRobot.() -> Unit): Transition {
+            onView(withText("Edit"))
                 .check((matches(withEffectiveVisibility(Visibility.VISIBLE))))
                 .perform(click())
+
+            HomeScreenRobot().interact()
+            return Transition()
+        }
+
+        fun renameTopSite(title: String, interact: HomeScreenRobot.() -> Unit): Transition {
             onView(Matchers.allOf(withId(R.id.top_site_title), instanceOf(EditText::class.java)))
                 .perform(ViewActions.replaceText(title))
+            onView(withId(android.R.id.button1)).perform((click()))
+
+            HomeScreenRobot().interact()
+            return Transition()
+        }
+
+        fun editTopSiteUrl(url: String, interact: HomeScreenRobot.() -> Unit): Transition {
+            onView(Matchers.allOf(withId(R.id.top_site_url), instanceOf(EditText::class.java)))
+                    .perform(ViewActions.replaceText(url))
             onView(withId(android.R.id.button1)).perform((click()))
 
             HomeScreenRobot().interact()
@@ -564,9 +581,25 @@ private fun assertTopSiteContextMenuItems() {
         waitingTime
     )
     mDevice.waitNotNull(
+        findObject(By.text("Edit")),
+        waitingTime
+    )
+    mDevice.waitNotNull(
         findObject(By.text("Remove")),
         waitingTime
     )
+}
+
+private fun assertEditTopSiteValues(title: String, url: String) {
+    onView(allOf(withId(R.id.top_site_title), instanceOf(EditText::class.java)))
+        .check(matches(withText(title)))
+    onView(allOf(withId(R.id.top_site_url), instanceOf(EditText::class.java)))
+        .check(matches(withText(url)))
+}
+
+private fun assertEditTopSiteUrlInvalid() {
+    onView(withId(R.id.top_site_url_layout))
+        .check(matches(hasDescendant(withText("Invalid URL"))))
 }
 
 private fun assertShareTabsOverlay() {
