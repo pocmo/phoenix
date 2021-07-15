@@ -16,6 +16,7 @@ import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.concept.storage.BookmarkNode
 import mozilla.components.feature.tab.collections.TabCollection
 import mozilla.components.feature.top.sites.TopSite
+import mozilla.components.feature.top.sites.TopSite.Type.FRECENT
 import mozilla.components.ui.widgets.WidgetSiteItemView
 import org.mozilla.fenix.components.Components
 import org.mozilla.fenix.components.tips.Tip
@@ -60,8 +61,7 @@ sealed class AdapterItem(@LayoutRes val viewType: Int) {
     data class TopSitePager(val topSites: List<TopSite>) :
         AdapterItem(TopSitePagerViewHolder.LAYOUT_ID) {
         override fun sameAs(other: AdapterItem): Boolean {
-            val newTopSites = (other as? TopSitePager) ?: return false
-            return newTopSites.topSites.size == this.topSites.size
+            return other is TopSitePager
         }
 
         override fun contentsSameAs(other: AdapterItem): Boolean {
@@ -77,9 +77,12 @@ sealed class AdapterItem(@LayoutRes val viewType: Int) {
             val oldTopSites = (this as? TopSitePager) ?: return null
 
             val changed = mutableSetOf<Pair<Int, TopSite>>()
-            for ((index, item) in newTopSites.topSites.withIndex()) {
-                if (oldTopSites.topSites.getOrNull(index) != item) {
-                    changed.add(Pair(index, item))
+
+            for ((index, item) in oldTopSites.topSites.withIndex()) {
+                val changedItem =
+                    newTopSites.topSites.getOrNull(index) ?: TopSite(-1, "REMOVED", "", 0, FRECENT)
+                if (changedItem != item) {
+                    changed.add((Pair(index, changedItem)))
                 }
             }
             return if (changed.isNotEmpty()) TopSitePagerPayload(changed) else null
