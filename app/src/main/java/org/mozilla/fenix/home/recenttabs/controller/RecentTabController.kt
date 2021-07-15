@@ -7,6 +7,8 @@ package org.mozilla.fenix.home.recenttabs.controller
 import androidx.navigation.NavController
 import mozilla.components.feature.tabs.TabsUseCases.SelectTabUseCase
 import org.mozilla.fenix.R
+import org.mozilla.fenix.components.metrics.Event
+import org.mozilla.fenix.components.metrics.MetricController
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.home.HomeFragmentDirections
 import org.mozilla.fenix.home.recenttabs.interactor.RecentTabInteractor
@@ -35,15 +37,18 @@ interface RecentTabController {
  */
 class DefaultRecentTabsController(
     private val selectTabUseCase: SelectTabUseCase,
-    private val navController: NavController
+    private val navController: NavController,
+    private val metrics: MetricController
 ) : RecentTabController {
 
     override fun handleRecentTabClicked(tabId: String) {
+        metrics.track(Event.OpenRecentTab)
         selectTabUseCase.invoke(tabId)
         navController.navigate(R.id.browserFragment)
     }
 
     override fun handleRecentTabShowAllClicked() {
+        metrics.track(Event.ShowAllRecentTabs)
         navController.nav(
             R.id.homeFragment,
             HomeFragmentDirections.actionGlobalTabsTrayFragment()
