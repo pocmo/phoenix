@@ -22,6 +22,7 @@ import mozilla.components.browser.menu.item.BrowserMenuImageText
 import mozilla.components.concept.sync.AccountObserver
 import mozilla.components.concept.sync.AuthType
 import mozilla.components.concept.sync.OAuthAccount
+import mozilla.components.concept.sync.Profile
 import mozilla.components.support.ktx.android.content.getColorFromAttr
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.accounts.AccountState
@@ -94,14 +95,6 @@ class HomeMenu(
     private fun getSyncItemTitle(): String =
         accountManager.accountProfileEmail ?: context.getString(R.string.sync_menu_sign_in)
 
-    private val syncSignInMenuItem = BrowserMenuImageText(
-        getSyncItemTitle(),
-        R.drawable.ic_synced_tabs,
-        primaryTextColor
-    ) {
-        onItemTapped.invoke(Item.SyncAccount(accountManager.accountState))
-    }
-
     val desktopItem = BrowserMenuImageSwitch(
         imageResource = R.drawable.ic_desktop,
         label = context.getString(R.string.browser_menu_desktop_site),
@@ -114,6 +107,14 @@ class HomeMenu(
     private fun coreMenuItems(): List<BrowserMenuItem> {
         val experiments = context.components.analytics.experiments
         val settings = context.components.settings
+
+        val syncSignInMenuItem = BrowserMenuImageText(
+            getSyncItemTitle(),
+            R.drawable.ic_synced_tabs,
+            primaryTextColor
+        ) {
+        onItemTapped.invoke(Item.SyncAccount(accountManager.accountState))
+        }
 
         val bookmarksItem = BrowserMenuImageText(
             context.getString(R.string.library_bookmarks),
@@ -209,10 +210,8 @@ class HomeMenu(
     }
 
     init {
-        val menuItems = coreMenuItems()
-
         // Report initial state.
-        onMenuBuilderChanged(BrowserMenuBuilder(menuItems))
+        onMenuBuilderChanged(BrowserMenuBuilder(coreMenuItems()))
 
         // Observe account state changes, and update menu item builder with a new set of items.
         context.components.backgroundServices.accountManagerAvailableQueue.runIfReadyOrQueue {
@@ -225,7 +224,17 @@ class HomeMenu(
                     lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                         onMenuBuilderChanged(
                             BrowserMenuBuilder(
-                                menuItems
+                                coreMenuItems()
+                            )
+                        )
+                    }
+                }
+
+                override fun onProfileUpdated(profile: Profile) {
+                    lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                        onMenuBuilderChanged(
+                            BrowserMenuBuilder(
+                                coreMenuItems()
                             )
                         )
                     }
@@ -235,7 +244,7 @@ class HomeMenu(
                     lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                         onMenuBuilderChanged(
                             BrowserMenuBuilder(
-                                menuItems
+                                coreMenuItems()
                             )
                         )
                     }
@@ -245,7 +254,7 @@ class HomeMenu(
                     lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
                         onMenuBuilderChanged(
                             BrowserMenuBuilder(
-                                menuItems
+                                coreMenuItems()
                             )
                         )
                     }

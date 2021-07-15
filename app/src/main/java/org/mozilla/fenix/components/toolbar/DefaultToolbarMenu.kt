@@ -9,14 +9,18 @@ import androidx.annotation.ColorRes
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.content.ContextCompat.getColor
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
+import mozilla.components.browser.menu.BrowserMenuBuilder
 import mozilla.components.browser.menu.BrowserMenuHighlight
+import mozilla.components.browser.menu.BrowserMenuItem
 import mozilla.components.browser.menu.WebExtensionBrowserMenuBuilder
 import mozilla.components.browser.menu.item.BrowserMenuDivider
 import mozilla.components.browser.menu.item.BrowserMenuHighlightableItem
@@ -30,6 +34,8 @@ import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.concept.storage.BookmarksStorage
+import mozilla.components.concept.sync.AccountObserver
+import mozilla.components.concept.sync.Profile
 import mozilla.components.feature.webcompat.reporter.WebCompatReporterFeature
 import mozilla.components.lib.state.ext.flowScoped
 import mozilla.components.support.ktx.android.content.getColorFromAttr
@@ -58,11 +64,12 @@ import org.mozilla.fenix.utils.BrowsersCache
 open class DefaultToolbarMenu(
     private val context: Context,
     private val store: BrowserStore,
-    hasAccountProblem: Boolean = false,
+    private val hasAccountProblem: Boolean = false,
     private val onItemTapped: (ToolbarMenu.Item) -> Unit = {},
     private val lifecycleOwner: LifecycleOwner,
     private val bookmarksStorage: BookmarksStorage,
-    val isPinningSupported: Boolean
+    val isPinningSupported: Boolean,
+    private val onMenuBuilderChanged: (BrowserMenuBuilder) -> Unit = {}
 ) : ToolbarMenu {
 
     private var isCurrentUrlBookmarked = false
@@ -75,21 +82,19 @@ open class DefaultToolbarMenu(
     private val selectedSession: TabSessionState?
         get() = store.state.selectedTab
 
-    override val menuBuilder by lazy {
-        WebExtensionBrowserMenuBuilder(
-            items = coreMenuItems,
-            endOfMenuAlwaysVisible = shouldUseBottomToolbar,
-            store = store,
-            style = WebExtensionBrowserMenuBuilder.Style(
-                webExtIconTintColorResource = primaryTextColor(),
-                addonsManagerMenuItemDrawableRes = R.drawable.ic_addons_extensions
-            ),
-            onAddonsManagerTapped = {
-                onItemTapped.invoke(ToolbarMenu.Item.AddonsManager)
-            },
-            appendExtensionSubMenuAtStart = shouldUseBottomToolbar
-        )
-    }
+    private fun buildMenu() = WebExtensionBrowserMenuBuilder(
+        items = coreMenuItems,
+        endOfMenuAlwaysVisible = shouldUseBottomToolbar,
+        store = store,
+        style = WebExtensionBrowserMenuBuilder.Style(
+            webExtIconTintColorResource = primaryTextColor(),
+            addonsManagerMenuItemDrawableRes = R.drawable.ic_addons_extensions
+        ),
+        onAddonsManagerTapped = {
+            onItemTapped.invoke(ToolbarMenu.Item.AddonsManager)
+        },
+        appendExtensionSubMenuAtStart = shouldUseBottomToolbar
+    )
 
     override val menuToolbar by lazy {
         val back = BrowserMenuItemToolbar.TwoStateButton(
@@ -336,49 +341,50 @@ open class DefaultToolbarMenu(
     private fun getSyncItemTitle() =
         accountManager.accountProfileEmail ?: context.getString(R.string.sync_menu_sign_in)
 
-    val syncMenuItem = BrowserMenuImageText(
-        getSyncItemTitle(),
-        R.drawable.ic_signed_out,
-        primaryTextColor()
-    ) {
-        onItemTapped.invoke(
-            ToolbarMenu.Item.SyncAccount(accountManager.accountState)
-        )
-    }
-
     @VisibleForTesting(otherwise = PRIVATE)
-    val coreMenuItems by lazy {
-        val menuItems =
-            listOfNotNull(
-                if (shouldUseBottomToolbar) null else menuToolbar,
-                newTabItem,
-                BrowserMenuDivider(),
-                bookmarksItem,
-                historyItem,
-                downloadsItem,
-                extensionsItem,
-                syncMenuItem,
-                BrowserMenuDivider(),
-                getSetDefaultBrowserItem(),
-                getSetDefaultBrowserItem()?.let { BrowserMenuDivider() },
-                findInPageItem,
-                desktopSiteItem,
-                customizeReaderView.apply { visible = ::shouldShowReaderViewCustomization },
-                openInApp.apply { visible = ::shouldShowOpenInApp },
-                reportSiteIssuePlaceholder,
-                BrowserMenuDivider(),
-                addToHomeScreenItem.apply { visible = ::canAddToHomescreen },
-                installToHomescreen.apply { visible = ::canInstall },
-                addToTopSitesItem,
-                saveToCollectionItem,
-                BrowserMenuDivider(),
-                settingsItem,
-                if (shouldDeleteDataOnQuit) deleteDataOnQuit else null,
-                if (shouldUseBottomToolbar) BrowserMenuDivider() else null,
-                if (shouldUseBottomToolbar) menuToolbar else null
-            )
+    var coreMenuItems = coreMenuItems()
 
-        menuItems
+    override var menuBuilder = buildMenu()
+
+    private fun coreMenuItems(): List<BrowserMenuItem> {
+        val syncMenuItem = BrowserMenuImageText(
+            getSyncItemTitle(),
+            R.drawable.ic_signed_out,
+            primaryTextColor()
+        ) {
+            onItemTapped.invoke(
+                ToolbarMenu.Item.SyncAccount(accountManager.accountState)
+            )
+        }
+
+        return listOfNotNull(
+            if (shouldUseBottomToolbar) null else menuToolbar,
+            newTabItem,
+            BrowserMenuDivider(),
+            bookmarksItem,
+            historyItem,
+            downloadsItem,
+            extensionsItem,
+            syncMenuItem,
+            BrowserMenuDivider(),
+            getSetDefaultBrowserItem(),
+            getSetDefaultBrowserItem()?.let { BrowserMenuDivider() },
+            findInPageItem,
+            desktopSiteItem,
+            customizeReaderView.apply { visible = ::shouldShowReaderViewCustomization },
+            openInApp.apply { visible = ::shouldShowOpenInApp },
+            reportSiteIssuePlaceholder,
+            BrowserMenuDivider(),
+            addToHomeScreenItem.apply { visible = ::canAddToHomescreen },
+            installToHomescreen.apply { visible = ::canInstall },
+            addToTopSitesItem,
+            saveToCollectionItem,
+            BrowserMenuDivider(),
+            settingsItem,
+            if (shouldDeleteDataOnQuit) deleteDataOnQuit else null,
+            if (shouldUseBottomToolbar) BrowserMenuDivider() else null,
+            if (shouldUseBottomToolbar) menuToolbar else null
+        )
     }
 
     private fun handleBookmarkItemTapped() {
@@ -438,6 +444,29 @@ open class DefaultToolbarMenu(
             } else {
                 null
             }
+        }
+    }
+
+    init {
+        // Observe account state changes, and update menu item builder with a new set of items.
+        context.components.backgroundServices.accountManagerAvailableQueue.runIfReadyOrQueue {
+            // This task isn't relevant if our parent fragment isn't around anymore.
+            if (lifecycleOwner.lifecycle.currentState == Lifecycle.State.DESTROYED) {
+                return@runIfReadyOrQueue
+            }
+            context.components.backgroundServices.accountManager.register(object : AccountObserver {
+                private fun updateMenu() {
+                    lifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+                        coreMenuItems = coreMenuItems()
+                        menuBuilder = buildMenu()
+                        onMenuBuilderChanged(menuBuilder)
+                    }
+                }
+
+                override fun onLoggedOut() { updateMenu() }
+
+                override fun onProfileUpdated(profile: Profile) { updateMenu() }
+            }, lifecycleOwner)
         }
     }
 }
