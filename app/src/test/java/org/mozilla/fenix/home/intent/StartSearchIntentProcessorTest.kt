@@ -71,4 +71,27 @@ class StartSearchIntentProcessorTest {
         }
         verify { out.removeExtra(HomeActivity.OPEN_TO_SEARCH) }
     }
+
+    @Test
+    fun `process assist intent`() {
+        val intent = Intent().apply { action=Intent.ACTION_ASSIST }
+        StartSearchIntentProcessor(metrics).process(intent, navController, out)
+        val options = navOptions {
+            popUpTo = R.id.homeFragment
+        }
+
+        verify {
+            navController.nav(
+                    null,
+                    NavGraphDirections.actionGlobalSearchDialog(
+                            sessionId = null,
+                            searchAccessPoint = Event.PerformedSearch.SearchAccessPoint.ASSIST
+                    ),
+                    options
+            )
+        }
+
+        verify { out wasNot Called }
+        verify { metrics wasNot Called }
+    }
 }

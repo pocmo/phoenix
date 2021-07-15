@@ -17,52 +17,53 @@ import org.mozilla.fenix.ext.nav
 /**
  * When the search widget is tapped, Fenix should open to the search fragment.
  * Tapping the private browsing mode launcher icon should also open to the search fragment.
+ * Long pressing home button should also open to the search fragment if fenix is set as the assist app
  */
 class StartSearchIntentProcessor(
     private val metrics: MetricController
 ) : HomeIntentProcessor {
 
     override fun process(intent: Intent, navController: NavController, out: Intent): Boolean {
-        val event = intent.extras?.getString(HomeActivity.OPEN_TO_SEARCH)
-        return if (event != null) {
-            val source = when (event) {
-                SEARCH_WIDGET -> {
-                    metrics.track(Event.SearchWidgetNewTabPressed)
-                    Event.PerformedSearch.SearchAccessPoint.WIDGET
-                }
-                STATIC_SHORTCUT_NEW_TAB -> {
-                    metrics.track(Event.PrivateBrowsingStaticShortcutTab)
-                    Event.PerformedSearch.SearchAccessPoint.SHORTCUT
-                }
-                STATIC_SHORTCUT_NEW_PRIVATE_TAB -> {
-                    metrics.track(Event.PrivateBrowsingStaticShortcutPrivateTab)
-                    Event.PerformedSearch.SearchAccessPoint.SHORTCUT
-                }
-                PRIVATE_BROWSING_PINNED_SHORTCUT -> {
-                    metrics.track(Event.PrivateBrowsingPinnedShortcutPrivateTab)
-                    Event.PerformedSearch.SearchAccessPoint.SHORTCUT
-                }
-                else -> null
+        var source :Event.PerformedSearch.SearchAccessPoint?= when (intent.extras?.getString(HomeActivity.OPEN_TO_SEARCH)) {
+            SEARCH_WIDGET -> {
+                metrics.track(Event.SearchWidgetNewTabPressed)
+                Event.PerformedSearch.SearchAccessPoint.WIDGET
             }
-
-            out.removeExtra(HomeActivity.OPEN_TO_SEARCH)
-
-            val directions = source?.let {
-                NavGraphDirections.actionGlobalSearchDialog(
-                    sessionId = null,
-                    searchAccessPoint = it
-                )
+            STATIC_SHORTCUT_NEW_TAB -> {
+                metrics.track(Event.PrivateBrowsingStaticShortcutTab)
+                Event.PerformedSearch.SearchAccessPoint.SHORTCUT
             }
-            directions?.let {
-                val options = navOptions {
-                    popUpTo = R.id.homeFragment
-                }
-                navController.nav(null, it, options)
+            STATIC_SHORTCUT_NEW_PRIVATE_TAB -> {
+                metrics.track(Event.PrivateBrowsingStaticShortcutPrivateTab)
+                Event.PerformedSearch.SearchAccessPoint.SHORTCUT
             }
-            true
-        } else {
-            false
+            PRIVATE_BROWSING_PINNED_SHORTCUT -> {
+                metrics.track(Event.PrivateBrowsingPinnedShortcutPrivateTab)
+                Event.PerformedSearch.SearchAccessPoint.SHORTCUT
+            }
+            else -> null
         }
+
+        when {
+            source != null -> {
+                out.removeExtra(HomeActivity.OPEN_TO_SEARCH)
+            }
+            intent.action == Intent.ACTION_ASSIST -> {
+                source = Event.PerformedSearch.SearchAccessPoint.ASSIST
+            }
+            else -> return false
+        }
+
+        val directions = NavGraphDirections.actionGlobalSearchDialog(
+                sessionId = null,
+                searchAccessPoint = source
+        )
+
+        val options = navOptions {
+            popUpTo = R.id.homeFragment
+        }
+        navController.nav(null, directions, options)
+        return true
     }
 
     companion object {
