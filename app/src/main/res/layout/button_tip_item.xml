@@ -57,7 +57,8 @@
     <TextView
         android:id="@+id/tip_learn_more"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
         android:text="@string/search_suggestions_onboarding_learn_more_link"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/primary_text_dark_theme"
