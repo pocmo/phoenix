@@ -109,7 +109,7 @@ open class FenixApplication : LocaleAwareApplication(), Provider {
             return
         }
 
-        if (Config.channel.isFenix) {
+        if (Config.channel.isFenix && BuildConfig.TELEMETRY) {
             // We need to always initialize Glean and do it early here.
             // Note that we are only initializing Glean here for "fenix" builds. "fennec" builds
             // will initialize in MigratingFenixApplication because we first need to migrate the
