@@ -14,12 +14,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.concept.storage.BookmarkNode
+import mozilla.components.concept.storage.HistoryMetadata
 import mozilla.components.feature.tab.collections.TabCollection
 import mozilla.components.feature.top.sites.TopSite
 import mozilla.components.ui.widgets.WidgetSiteItemView
 import org.mozilla.fenix.components.Components
 import org.mozilla.fenix.components.tips.Tip
+import org.mozilla.fenix.historymetadata.HistoryMetadataContainer
+import org.mozilla.fenix.historymetadata.view.HistoryMetadataContainerViewHolder
+import org.mozilla.fenix.historymetadata.view.HistoryMetadataHeaderViewHolder
+import org.mozilla.fenix.historymetadata.view.HistoryMetadataViewHolder
 import org.mozilla.fenix.home.OnboardingState
+import org.mozilla.fenix.home.recentbookmarks.view.RecentBookmarksViewHolder
+import org.mozilla.fenix.home.recenttabs.view.RecentTabViewHolder
+import org.mozilla.fenix.home.recenttabs.view.RecentTabsHeaderViewHolder
 import org.mozilla.fenix.home.sessioncontrol.viewholders.CollectionHeaderViewHolder
 import org.mozilla.fenix.home.sessioncontrol.viewholders.CollectionViewHolder
 import org.mozilla.fenix.home.sessioncontrol.viewholders.NoCollectionsMessageViewHolder
@@ -38,9 +46,6 @@ import org.mozilla.fenix.home.sessioncontrol.viewholders.onboarding.OnboardingTh
 import org.mozilla.fenix.home.sessioncontrol.viewholders.onboarding.OnboardingToolbarPositionPickerViewHolder
 import org.mozilla.fenix.home.sessioncontrol.viewholders.onboarding.OnboardingTrackingProtectionViewHolder
 import org.mozilla.fenix.home.sessioncontrol.viewholders.onboarding.OnboardingWhatsNewViewHolder
-import org.mozilla.fenix.home.recenttabs.view.RecentTabViewHolder
-import org.mozilla.fenix.home.recenttabs.view.RecentTabsHeaderViewHolder
-import org.mozilla.fenix.home.recentbookmarks.view.RecentBookmarksViewHolder
 import org.mozilla.fenix.home.tips.ButtonTipViewHolder
 import mozilla.components.feature.tab.collections.Tab as ComponentTab
 
@@ -126,7 +131,8 @@ sealed class AdapterItem(@LayoutRes val viewType: Int) {
         val state: OnboardingState.SignedOutCanAutoSignIn
     ) : AdapterItem(OnboardingAutomaticSignInViewHolder.LAYOUT_ID)
 
-    object ExperimentDefaultBrowserCard : AdapterItem(ExperimentDefaultBrowserCardViewHolder.LAYOUT_ID)
+    object ExperimentDefaultBrowserCard :
+        AdapterItem(ExperimentDefaultBrowserCardViewHolder.LAYOUT_ID)
 
     object OnboardingThemePicker : AdapterItem(OnboardingThemePickerViewHolder.LAYOUT_ID)
     object OnboardingTrackingProtection :
@@ -141,7 +147,8 @@ sealed class AdapterItem(@LayoutRes val viewType: Int) {
     object OnboardingWhatsNew : AdapterItem(OnboardingWhatsNewViewHolder.LAYOUT_ID)
 
     object RecentTabsHeader : AdapterItem(RecentTabsHeaderViewHolder.LAYOUT_ID)
-    data class RecentTabItem(val tab: TabSessionState) : AdapterItem(RecentTabViewHolder.LAYOUT_ID) {
+    data class RecentTabItem(val tab: TabSessionState) :
+        AdapterItem(RecentTabViewHolder.LAYOUT_ID) {
         override fun sameAs(other: AdapterItem) = other is RecentTabItem && tab.id == other.tab.id
 
         override fun contentsSameAs(other: AdapterItem): Boolean {
@@ -149,7 +156,22 @@ sealed class AdapterItem(@LayoutRes val viewType: Int) {
             // We only care about updating if the title and icon have changed because that is
             // all we show today. This should be updated if we want to show updates for more.
             return tab.content.title == otherItem.tab.content.title &&
-                    tab.content.icon == otherItem.tab.content.icon
+                tab.content.icon == otherItem.tab.content.icon
+        }
+    }
+
+    object HistoryMetadataHeader : AdapterItem(HistoryMetadataHeaderViewHolder.LAYOUT_ID)
+
+    data class HistoryMetadataGroup(val historyMetadataContainer: HistoryMetadataContainer) :
+        AdapterItem(HistoryMetadataContainerViewHolder.LAYOUT_ID) {
+        override fun sameAs(other: AdapterItem) =
+            other is HistoryMetadataGroup && historyMetadataContainer == other.historyMetadataContainer
+
+        override fun contentsSameAs(other: AdapterItem): Boolean {
+            (other as? HistoryMetadataGroup)?.let {
+                return it.historyMetadataContainer.expanded == this.historyMetadataContainer.expanded &&
+                    it.historyMetadataContainer.title == this.historyMetadataContainer.title
+            } ?: return false
         }
     }
 
@@ -177,6 +199,13 @@ sealed class AdapterItem(@LayoutRes val viewType: Int) {
                 }
             }
         }
+
+    data class HistoryMetadataItem(val historyMetadata: HistoryMetadata) : AdapterItem(
+        HistoryMetadataViewHolder.LAYOUT_ID
+    ) {
+        override fun sameAs(other: AdapterItem) =
+            other is HistoryMetadataItem && historyMetadata.key.url == other.historyMetadata.key.url
+    }
 
     /**
      * True if this item represents the same value as other. Used by [AdapterItemDiffCallback].
@@ -257,13 +286,24 @@ class SessionControlAdapter(
             OnboardingToolbarPositionPickerViewHolder.LAYOUT_ID -> OnboardingToolbarPositionPickerViewHolder(
                 view
             )
-            ExperimentDefaultBrowserCardViewHolder.LAYOUT_ID -> ExperimentDefaultBrowserCardViewHolder(view, interactor)
+            ExperimentDefaultBrowserCardViewHolder.LAYOUT_ID -> ExperimentDefaultBrowserCardViewHolder(
+                view,
+                interactor
+            )
             RecentTabsHeaderViewHolder.LAYOUT_ID -> RecentTabsHeaderViewHolder(view, interactor)
             RecentTabViewHolder.LAYOUT_ID -> RecentTabViewHolder(view, interactor)
             RecentBookmarksViewHolder.LAYOUT_ID -> {
                 RecentBookmarksViewHolder(view, interactor)
             }
-
+            HistoryMetadataHeaderViewHolder.LAYOUT_ID -> HistoryMetadataHeaderViewHolder(
+                view,
+                interactor
+            )
+            HistoryMetadataContainerViewHolder.LAYOUT_ID -> HistoryMetadataContainerViewHolder(
+                view,
+                interactor
+            )
+            HistoryMetadataViewHolder.LAYOUT_ID -> HistoryMetadataViewHolder(view, interactor)
             else -> throw IllegalStateException()
         }
     }
@@ -322,6 +362,12 @@ class SessionControlAdapter(
                 holder.bind(
                     (item as AdapterItem.RecentBookmarks).recentBookmarks
                 )
+            }
+            is HistoryMetadataViewHolder -> {
+                holder.bind((item as AdapterItem.HistoryMetadataItem).historyMetadata)
+            }
+            is HistoryMetadataContainerViewHolder -> {
+                holder.bind((item as AdapterItem.HistoryMetadataGroup).historyMetadataContainer)
             }
         }
     }
