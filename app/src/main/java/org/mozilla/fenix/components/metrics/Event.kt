@@ -243,6 +243,11 @@ sealed class Event {
     object StartOnHomeEnterHomeScreen : Event()
     object StartOnHomeOpenTabsTray : Event()
 
+    // Credit cards
+    object CreditCardManualSave : Event()
+    object CreditCardDelete : Event()
+    object CreditCardAutofill : Event()
+
     // Interaction events with extras
 
     data class TopSiteSwipeCarousel(val page: Int) : Event() {

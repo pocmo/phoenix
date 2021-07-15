@@ -12,9 +12,10 @@ import kotlinx.coroutines.launch
 import mozilla.components.concept.storage.NewCreditCardFields
 import mozilla.components.concept.storage.UpdatableCreditCardFields
 import mozilla.components.service.sync.autofill.AutofillCreditCardsAddressesStorage
+import org.mozilla.fenix.components.metrics.Event
+import org.mozilla.fenix.components.metrics.MetricController
 import org.mozilla.fenix.settings.creditcards.CreditCardEditorFragment
 import org.mozilla.fenix.settings.creditcards.interactor.CreditCardEditorInteractor
-import org.mozilla.fenix.utils.Settings
 
 /**
  * [CreditCardEditorFragment] controller. An interface that handles the view manipulation of the
@@ -50,14 +51,14 @@ interface CreditCardEditorController {
  * credit cards.
  * @param lifecycleScope [CoroutineScope] scope to launch coroutines.
  * @param navController [NavController] used for navigation.
- * @param settings [Settings] application settings.
+ * @param metrics [MetricController] that handles telemetry events.
  * @param ioDispatcher [CoroutineDispatcher] used for executing async tasks. Defaults to [Dispatchers.IO].
  */
 class DefaultCreditCardEditorController(
     private val storage: AutofillCreditCardsAddressesStorage,
     private val lifecycleScope: CoroutineScope,
     private val navController: NavController,
-    private val settings: Settings,
+    private val metrics: MetricController,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : CreditCardEditorController {
 
@@ -66,7 +67,7 @@ class DefaultCreditCardEditorController(
     }
 
     override fun handleDeleteCreditCard(guid: String) {
-        settings.creditCardsDeletedCount += 1
+        metrics.track(Event.CreditCardDelete)
 
         lifecycleScope.launch(ioDispatcher) {
             storage.deleteCreditCard(guid)
@@ -78,7 +79,7 @@ class DefaultCreditCardEditorController(
     }
 
     override fun handleSaveCreditCard(creditCardFields: NewCreditCardFields) {
-        settings.creditCardsSavedCount += 1
+        metrics.track(Event.CreditCardManualSave)
 
         lifecycleScope.launch(ioDispatcher) {
             storage.addCreditCard(creditCardFields)

@@ -4,26 +4,47 @@
 
 package org.mozilla.fenix.settings.creditcards
 
+import androidx.navigation.NavController
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineScope
 import mozilla.components.concept.storage.CreditCard
 import mozilla.components.concept.storage.CreditCardNumber
 import mozilla.components.concept.storage.NewCreditCardFields
 import mozilla.components.concept.storage.UpdatableCreditCardFields
+import mozilla.components.service.sync.autofill.AutofillCreditCardsAddressesStorage
 import mozilla.components.support.utils.CreditCardNetworkType
 import org.junit.Before
 import org.junit.Test
+import org.mozilla.fenix.components.metrics.MetricController
 import org.mozilla.fenix.settings.creditcards.controller.CreditCardEditorController
+import org.mozilla.fenix.settings.creditcards.controller.DefaultCreditCardEditorController
 import org.mozilla.fenix.settings.creditcards.interactor.DefaultCreditCardEditorInteractor
 
+@ExperimentalCoroutinesApi
 class DefaultCreditCardEditorInteractorTest {
 
-    private val controller: CreditCardEditorController = mockk(relaxed = true)
+    private val storage: AutofillCreditCardsAddressesStorage = mockk(relaxed = true)
+    private val navController: NavController = mockk(relaxed = true)
+    private val metrics: MetricController = mockk(relaxed = true)
+    private val testCoroutineScope = TestCoroutineScope()
 
+    private lateinit var controller: CreditCardEditorController
     private lateinit var interactor: DefaultCreditCardEditorInteractor
 
     @Before
     fun setup() {
+        controller = spyk(
+            DefaultCreditCardEditorController(
+                storage,
+                testCoroutineScope,
+                navController,
+                metrics
+            )
+        )
+
         interactor = DefaultCreditCardEditorInteractor(controller)
     }
 
