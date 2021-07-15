@@ -17,9 +17,9 @@
         style="@style/Mozac.Widgets.Favicon"
         android:layout_marginStart="16dp"
         android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/webAddressView"
@@ -27,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/saved_logins_item_margin_start"
         android:layout_marginEnd="@dimen/saved_logins_item_margin_end"
+        android:contentDescription="@string/text_field_for_displaying_web_address"
         android:ellipsize="middle"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceListItem"
@@ -44,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/saved_logins_item_margin_start"
         android:layout_marginEnd="@dimen/saved_logins_item_margin_end"
+        android:contentDescription="@string/text_field_for_displaying_username"
         android:ellipsize="middle"
         android:singleLine="true"
         android:textColor="?secondaryText"

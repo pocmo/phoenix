@@ -1544,6 +1544,10 @@
     <string name="saved_logins_sort_strategy_last_used">Last used</string>
     <!-- Content description (not visible, for screen readers etc.): Sort saved logins dropdown menu chevron icon -->
     <string name="saved_logins_menu_dropdown_chevron_icon_content_description">Sort logins menu</string>
+    <!-- Content description for a login's web address text field -->
+    <string name="text_field_for_displaying_web_address">Text field for displaying the web address</string>
+    <!-- Content description for a login's username text field -->
+    <string name="text_field_for_displaying_username">Text field for displaying the username</string>
 
     <!-- Credit Cards Autofill -->
     <!-- Preference and title for managing the settings for credit cards -->
