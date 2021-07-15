@@ -7,8 +7,8 @@ policy:
 tasks:
     - $let:
           taskgraph:
-              branch: taskgraph
-              revision: 9daff451cfbe82c5c70237a7b3dbcf4fd3238299
+              branch: taskgraph-try
+              revision: 41642b3b13272965ec66e1461c9c928c484e0c15
           trustDomain: mobile
       in:
           $let:
