@@ -9,6 +9,8 @@ import android.view.View
 import androidx.preference.PreferenceFragmentCompat
 import org.mozilla.fenix.R
 import org.mozilla.fenix.components.metrics.Event
+import org.mozilla.fenix.components.metrics.Event.TabViewSettingChanged
+import org.mozilla.fenix.components.metrics.Event.TabViewSettingChanged.Type
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.showToolbar
 import org.mozilla.fenix.utils.view.addToRadioGroup
@@ -60,6 +62,9 @@ class TabsSettingsFragment : PreferenceFragmentCompat() {
         startOnHomeRadioAlways = requirePreference(R.string.pref_key_start_on_home_always)
         startOnHomeRadioNever = requirePreference(R.string.pref_key_start_on_home_never)
 
+        listRadioButton.onClickListener(::sendTabViewTelemetry)
+        gridRadioButton.onClickListener(::sendTabViewTelemetry)
+
         setupRadioGroups()
     }
 
@@ -81,5 +86,15 @@ class TabsSettingsFragment : PreferenceFragmentCompat() {
             startOnHomeRadioAlways,
             startOnHomeRadioNever
         )
+    }
+
+    private fun sendTabViewTelemetry() {
+        val metrics = requireContext().components.analytics.metrics
+
+        if (listRadioButton.isChecked && !gridRadioButton.isChecked) {
+            metrics.track(TabViewSettingChanged(Type.LIST))
+        } else {
+            metrics.track(TabViewSettingChanged(Type.GRID))
+        }
     }
 }
