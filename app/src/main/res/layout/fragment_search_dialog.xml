@@ -172,25 +172,41 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ToggleButton
-        android:id="@+id/qr_scan_button"
-        style="@style/search_pill"
-        android:layout_marginEnd="@dimen/search_fragment_scan_button_margin_end"
-        android:textOff="@string/search_scan_button"
-        android:textOn="@string/search_scan_button"
-        app:drawableStartCompat="@drawable/ic_qr"
+    <RelativeLayout
+        android:id="@+id/qr_scan_button_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="72dp"
         app:layout_constraintBottom_toBottomOf="@id/pill_wrapper"
-        app:layout_constraintEnd_toStartOf="@id/search_engines_shortcut_button"
+        app:layout_constraintEnd_toStartOf="@id/search_engines_shortcut_layout"
         app:layout_constraintStart_toStartOf="@id/pill_wrapper"
-        app:layout_constraintTop_toTopOf="@id/pill_wrapper" />
+        app:layout_constraintTop_toTopOf="@id/pill_wrapper">
 
-    <ToggleButton
-        android:id="@+id/search_engines_shortcut_button"
-        style="@style/search_pill"
-        android:textOff="@string/search_engine_button"
-        android:textOn="@string/search_engine_button"
-        app:drawableStartCompat="@drawable/ic_search"
+        <ToggleButton
+            android:id="@+id/qr_scan_button"
+            style="@style/search_pill"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="@dimen/search_fragment_scan_button_margin_end"
+            android:textOff="@string/search_scan_button"
+            android:textOn="@string/search_scan_button"
+            app:drawableStartCompat="@drawable/ic_qr" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/search_engines_shortcut_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="72dp"
         app:layout_constraintBottom_toBottomOf="@id/pill_wrapper"
-        app:layout_constraintStart_toEndOf="@id/qr_scan_button"
-        app:layout_constraintTop_toTopOf="@id/pill_wrapper" />
+        app:layout_constraintStart_toEndOf="@id/qr_scan_button_layout"
+        app:layout_constraintTop_toTopOf="@id/pill_wrapper">
+
+        <ToggleButton
+            android:id="@+id/search_engines_shortcut_button"
+            style="@style/search_pill"
+            android:layout_centerInParent="true"
+            android:textOff="@string/search_engine_button"
+            android:textOn="@string/search_engine_button"
+            app:drawableStartCompat="@drawable/ic_search" />
+
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

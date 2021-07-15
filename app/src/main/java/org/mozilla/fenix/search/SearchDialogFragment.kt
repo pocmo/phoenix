@@ -11,17 +11,14 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.text.style.StyleSpan
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewStub
-import android.view.WindowManager
+import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
@@ -68,6 +65,7 @@ import org.mozilla.fenix.search.awesomebar.AwesomeBarView
 import org.mozilla.fenix.search.toolbar.ToolbarView
 import org.mozilla.fenix.settings.SupportUtils
 import org.mozilla.fenix.widget.VoiceSearchActivity
+import kotlin.math.roundToInt
 
 typealias SearchDialogFragmentStore = SearchFragmentStore
 
@@ -269,6 +267,40 @@ class SearchDialogFragment : AppCompatDialogFragment(), UserInteractionHandler {
                 }
             }
             requireContext().settings().setCameraPermissionNeededState = false
+        }
+
+        // To increase touch area of the toggle buttons, without altering actual view bounds
+
+        fun Int.dpToPx() = (this * resources.displayMetrics.density).roundToInt()
+
+        search_engines_shortcut_layout.post {
+            val delegateArea = Rect()
+            search_engines_shortcut_button.apply { isEnabled = true }
+            search_engines_shortcut_layout.getHitRect(delegateArea)
+            delegateArea.top = search_engines_shortcut_button.top - 16.dpToPx()
+            delegateArea.bottom = search_engines_shortcut_button.bottom + 16.dpToPx()
+            delegateArea.left = search_engines_shortcut_button.left
+            delegateArea.right = search_engines_shortcut_button.right
+
+            (search_engines_shortcut_button.parent as? View)?.apply {
+                touchDelegate = TouchDelegate(delegateArea, search_engines_shortcut_button)
+            }
+
+        }
+
+        qr_scan_button_layout.post {
+            val delegateArea = Rect()
+            qr_scan_button.apply { isEnabled = true }
+            qr_scan_button_layout.getHitRect(delegateArea)
+            delegateArea.top = qr_scan_button.top - 16.dpToPx()
+            delegateArea.bottom = qr_scan_button.bottom + 16.dpToPx()
+            delegateArea.left = qr_scan_button.left
+            delegateArea.right = qr_scan_button.right
+
+            (qr_scan_button.parent as? View)?.apply {
+                touchDelegate = TouchDelegate(delegateArea, qr_scan_button)
+            }
+
         }
 
         fill_link_from_clipboard.setOnClickListener {
