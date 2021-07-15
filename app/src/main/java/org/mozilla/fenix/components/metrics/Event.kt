@@ -243,6 +243,10 @@ sealed class Event {
     object StartOnHomeEnterHomeScreen : Event()
     object StartOnHomeOpenTabsTray : Event()
 
+    // Recent bookmarks on Home
+    object RecentBookmarkClicked : Event()
+    object RecentBookmarkShowAll : Event()
+
     // Interaction events with extras
 
     data class TopSiteSwipeCarousel(val page: Int) : Event() {
